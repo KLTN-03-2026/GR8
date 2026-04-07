@@ -1,24 +1,23 @@
-import logo from './logo.svg';
-import './App.css';
+import { Layout, Typography } from "antd";
+import ApartmentList from "./pages/ApartmentList.jsx";
+import "./App.css";
+
+const { Header, Content } = Layout;
+const { Title } = Typography;
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Layout className="min-h-screen">
+      <Header className="bg-white px-6 shadow-sm">
+        <Title level={3} className="m-0">
+          Hệ thống Quản lý Chung cư
+        </Title>
+      </Header>
+
+      <Content className="p-6 bg-gray-100">
+        <ApartmentList />
+      </Content>
+    </Layout>
   );
 }
 
