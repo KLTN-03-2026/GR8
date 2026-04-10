@@ -14,7 +14,6 @@ const router = express.Router();
 router.get("/", getApartments);           // Xem danh sách căn hộ
 router.get("/:id", getApartmentDetail);   // Xem chi tiết căn hộ
 
-// ==================== ROUTES CẦN ĐĂNG NHẬP ====================
 // Chỉ người đã đăng nhập + có vai trò ChuNha hoặc QuanLy mới được tạo căn hộ
 router.post(
   "/",
