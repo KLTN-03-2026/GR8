@@ -1,0 +1,613 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== ENUMS ====================
+
+enum LoaiGiayTo {
+  CCCD
+  Passport
+}
+
+enum VaiTro {
+  KhachVangLai
+  NguoiThue
+  QuanLy
+  NhanVienKyThuat
+  KeToan
+  ChuNha
+}
+
+enum media_LoaiEntity {
+  NguoiDung_CCCD
+  CanHo
+  YeuCauSuCo
+  HopDong
+  BaoCaoSuaChua
+}
+
+enum statushistory_EntityType {
+  CanHo
+  HopDong
+  YeuCauThue
+  YeuCauSuCo
+  ChuyenNhuong
+  HoaDon
+}
+
+enum hoadonchitiet_Loai {
+  TienThue
+  Dien
+  Nuoc
+  DichVu
+  Phat
+}
+
+enum tinnhanchatbot_LoaiNguoiGui {
+  User
+  AI
+}
+
+enum thongbao_Loai {
+  Chung
+  Rieng
+  NhacNo
+  SuCo
+  HopDong
+}
+
+enum dichvu_TrangThai {
+  Active
+  Inactive
+}
+
+enum media_LoaiFile {
+  image
+  video
+  pdf
+}
+
+enum yeucauthue_TrangThai {
+  ChoKiemTra
+  ChoDuyet
+  DaDuyet
+  TuChoi
+}
+
+enum chuyennhuong_TrangThai {
+  ChoDuyet
+  DaDuyet
+  TuChoi
+}
+
+enum thanhtoan_PhuongThuc {
+  ChuyenKhoan
+  TienMat
+  ViDienTu
+  VNPay
+  Momo
+  ZaloPay
+}
+
+enum yeucaudichvu_TrangThai {
+  ChoXuLy
+  DaXuLy
+}
+
+enum yeucausuco_DoUuTien {
+  Thap
+  Trung
+  Cao
+}
+
+enum hoadon_TrangThai {
+  ChuaTT
+  DaTT
+  QuaHan
+}
+
+enum yeucausuco_TrangThai {
+  Moi
+  QuanLyDaNhan
+  DangXuLy
+  DaGiaiQuyet
+}
+
+enum canho_TrangThai {
+  Trong
+  DaThue
+  BaoTri
+  DangDon
+}
+
+enum hopdong_TrangThai {
+  ChoKy
+  DaKy
+  DangThue
+  HetHan
+  ChuyenNhuong
+  DaChuyenNhuong
+  KetThuc
+}
+
+enum nguoidung_GioiTinh {
+  Nam
+  Nu
+  Khac
+}
+
+enum nguoidung_TrangThai {
+  Active
+  Inactive
+  Locked
+}
+
+// ==================== MODELS ====================
+
+model canho {
+  ID        Int              @id @default(autoincrement())
+  MaCanHo   String           @unique @db.VarChar(20)
+  ToaNhaID  Int?
+  Tang      Int
+  SoPhong   String           @db.VarChar(10)
+  DienTich  Decimal?         @db.Decimal(10, 2)
+  GiaThue   Decimal          @db.Decimal(15, 2)
+  TienCoc   Decimal          @db.Decimal(15, 2)
+  TrangThai canho_TrangThai? @default(Trong)
+  MoTa      String?          @db.Text
+  ChuNhaID  Int
+
+  toanha    toanha?   @relation(fields: [ToaNhaID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  nguoidung nguoidung @relation("ChuNha_CanHo", fields: [ChuNhaID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+
+  canho_tienich canho_tienich[]
+  chisodiennuoc chisodiennuoc[]
+  hopdong       hopdong[]
+  yeucaudichvu  yeucaudichvu[]
+  yeucausuco    yeucausuco[]
+  yeucauthue    yeucauthue[]
+
+  @@index([ChuNhaID])
+  @@index([ToaNhaID])
+  @@index([TrangThai])
+}
+
+model canho_tienich {
+  CanHoID   Int
+  TienIchID Int
+  canho     canho   @relation(fields: [CanHoID], references: [ID], onDelete: Cascade)
+  tienich   tienich @relation(fields: [TienIchID], references: [ID], onDelete: Cascade)
+
+  @@id([CanHoID, TienIchID])
+}
+
+model chisodiennuoc {
+  ID           Int       @id @default(autoincrement())
+  CanHoID      Int
+  ThangNam     String    @db.VarChar(7)
+  ChiSoDienCu  Decimal?  @default(0.00) @db.Decimal(10, 2)
+  ChiSoDienMoi Decimal   @db.Decimal(10, 2)
+  ChiSoNuocCu  Decimal?  @default(0.00) @db.Decimal(10, 2)
+  ChiSoNuocMoi Decimal   @db.Decimal(10, 2)
+  NgayGhi      DateTime? @default(now()) @db.DateTime(0)
+  NguoiGhiID   Int?
+
+  canho     canho      @relation(fields: [CanHoID], references: [ID])
+  nguoidung nguoidung? @relation(fields: [NguoiGhiID], references: [ID])
+
+  @@index([CanHoID])
+  @@index([NguoiGhiID])
+}
+
+model chuyennhuong {
+  ID             Int                     @id @default(autoincrement())
+  HopDongID      Int
+  NguoiThueCuID  Int
+  NguoiThueMoiID Int
+  NgayYeuCau     DateTime?               @default(now()) @db.DateTime(0)
+  TrangThai      chuyennhuong_TrangThai? @default(ChoDuyet)
+  QuanLyDuyetID  Int?
+  ChuNhaDuyetID  Int?
+  NewHopDongID   Int?
+
+  hopdong_chuyennhuong_HopDongIDTohopdong          hopdong    @relation("chuyennhuong_HopDongIDTohopdong", fields: [HopDongID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  nguoidung_chuyennhuong_NguoiThueCuIDTonguoidung  nguoidung  @relation("chuyennhuong_NguoiThueCuIDTonguoidung", fields: [NguoiThueCuID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  nguoidung_chuyennhuong_NguoiThueMoiIDTonguoidung nguoidung  @relation("chuyennhuong_NguoiThueMoiIDTonguoidung", fields: [NguoiThueMoiID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  nguoidung_chuyennhuong_QuanLyDuyetIDTonguoidung  nguoidung? @relation("chuyennhuong_QuanLyDuyetIDTonguoidung", fields: [QuanLyDuyetID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  nguoidung_chuyennhuong_ChuNhaDuyetIDTonguoidung  nguoidung? @relation("chuyennhuong_ChuNhaDuyetIDTonguoidung", fields: [ChuNhaDuyetID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  hopdong_chuyennhuong_NewHopDongIDTohopdong       hopdong?   @relation("chuyennhuong_NewHopDongIDTohopdong", fields: [NewHopDongID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([ChuNhaDuyetID])
+  @@index([HopDongID])
+  @@index([NewHopDongID])
+  @@index([NguoiThueCuID])
+  @@index([NguoiThueMoiID])
+  @@index([QuanLyDuyetID])
+}
+
+model cuoctrochuyen {
+  ID          Int       @id @default(autoincrement())
+  NguoiDungID Int
+  SessionID   String    @unique @db.VarChar(50)
+  NgayBatDau  DateTime? @default(now()) @db.DateTime(0)
+
+  nguoidung      nguoidung        @relation(fields: [NguoiDungID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  tinnhanchatbot tinnhanchatbot[]
+
+  @@index([NguoiDungID])
+}
+
+model dichvu {
+  ID           Int               @id @default(autoincrement())
+  TenDichVu    String            @db.VarChar(100)
+  MoTa         String?           @db.Text
+  Gia          Decimal           @db.Decimal(12, 2)
+  TrangThai    dichvu_TrangThai? @default(Active)
+  yeucaudichvu yeucaudichvu[]
+}
+
+model hoadon {
+  ID         Int               @id @default(autoincrement())
+  HopDongID  Int
+  ThangNam   String            @db.VarChar(7)
+  NgayLap    DateTime          @db.Date
+  NgayDenHan DateTime          @db.Date
+  TongTien   Decimal           @db.Decimal(15, 2)
+  TrangThai  hoadon_TrangThai? @default(ChuaTT)
+
+  hopdong       hopdong         @relation(fields: [HopDongID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  hoadonchitiet hoadonchitiet[]
+  thanhtoan     thanhtoan[]
+
+  @@index([HopDongID])
+  @@index([TrangThai])
+}
+
+model hoadonchitiet {
+  ID       Int                @id @default(autoincrement())
+  HoaDonID Int
+  Loai     hoadonchitiet_Loai
+  SoTien   Decimal            @db.Decimal(15, 2)
+  MoTa     String?            @db.Text
+
+  hoadon hoadon @relation(fields: [HoaDonID], references: [ID], onDelete: Cascade)
+
+  @@index([HoaDonID])
+}
+
+model hopdong {
+  ID            Int                @id @default(autoincrement())
+  YeuCauThueID  Int?
+  CanHoID       Int
+  NguoiThueID   Int
+  NgayBatDau    DateTime           @db.Date
+  NgayKetThuc   DateTime           @db.Date
+  GiaThue       Decimal            @db.Decimal(15, 2)
+  TienCoc       Decimal            @db.Decimal(15, 2)
+  TienCocDaNhan Decimal?           @default(0.00) @db.Decimal(15, 2)
+  TrangThai     hopdong_TrangThai? @default(ChoKy)
+  NgayKy        DateTime?          @db.Date
+  FileHopDong   String?            @db.VarChar(500)
+
+  chuyennhuong_chuyennhuong_HopDongIDTohopdong    chuyennhuong[] @relation("chuyennhuong_HopDongIDTohopdong")
+  chuyennhuong_chuyennhuong_NewHopDongIDTohopdong chuyennhuong[] @relation("chuyennhuong_NewHopDongIDTohopdong")
+  hoadon                                          hoadon[]
+  yeucauthue                                      yeucauthue?    @relation(fields: [YeuCauThueID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  canho                                           canho          @relation(fields: [CanHoID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  nguoidung                                       nguoidung      @relation(fields: [NguoiThueID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([CanHoID])
+  @@index([NguoiThueID])
+  @@index([YeuCauThueID])
+  @@index([TrangThai])
+}
+
+model media {
+  ID         Int              @id @default(autoincrement())
+  LoaiEntity media_LoaiEntity
+  EntityID   Int
+  FileURL    String           @db.VarChar(500)
+  LoaiFile   media_LoaiFile?  @default(image)
+  NgayUpload DateTime?        @default(now()) @db.Timestamp(0)
+  UploadedBy Int?
+
+  nguoidung nguoidung? @relation(fields: [UploadedBy], references: [ID], onUpdate: NoAction)
+
+  @@index([UploadedBy])
+}
+
+model nguoidung {
+  ID          Int     @id @default(autoincrement())
+  TenDangNhap String  @unique @db.VarChar(50)
+  MatKhau     String  @db.VarChar(255)
+  HoTen       String  @db.VarChar(100)
+  Email       String  @unique @db.VarChar(100)
+  SoDienThoai String? @unique @db.VarChar(20)
+
+  // Hỗ trợ người nước ngoài
+  LoaiGiayTo       LoaiGiayTo? @default(CCCD)
+  SoGiayTo         String?     @unique @db.VarChar(50)
+  NgayHetHanGiayTo DateTime?   @db.Date
+  QuocTich         String?     @db.VarChar(100)
+  VisaType         String?     @db.VarChar(50)
+  NgayHetHanVisa   DateTime?   @db.Date
+
+  // Thông tin cũ
+  CCCD      String?              @unique @db.VarChar(20)
+  NgaySinh  DateTime?            @db.Date
+  DiaChi    String?              @db.VarChar(255)
+  Avatar    String?              @db.VarChar(500)
+  GioiTinh  nguoidung_GioiTinh?
+  NgayTao   DateTime?            @default(now()) @db.Timestamp(0)
+  TrangThai nguoidung_TrangThai? @default(Active)
+  VaiTro    VaiTro?              @default(NguoiThue)
+
+  // Relations
+  canho              canho[]              @relation("ChuNha_CanHo")
+  chisodiennuoc      chisodiennuoc[]
+  cuoctrochuyen      cuoctrochuyen[]
+  hopdong            hopdong[]
+  media              media[]
+  refreshtokens      refreshtokens[]
+  statushistory      statushistory[]
+  systemlogs         systemlogs[]
+  thanhtoan          thanhtoan[]
+  thongbao           thongbao[]
+  thongbao_nguoinhan thongbao_nguoinhan[]
+  toanha             toanha[]
+  userroles          userroles[]
+  yeucaudichvu       yeucaudichvu[]
+
+  // Yêu cầu sự cố
+  yeucausucoAsNguoiThue yeucausuco[] @relation("yeucausuco_NguoiThueIDTonguoidung")
+  yeucausucoAsQuanLy    yeucausuco[] @relation("yeucausuco_QuanLyNhanIDTonguoidung")
+  yeucausucoAsNhanVien  yeucausuco[] @relation("yeucausuco_NhanVienXuLyIDTonguoidung")
+
+  // Yêu cầu thuê
+  yeucauthueAsNguoiYeuCau yeucauthue[] @relation("yeucauthue_NguoiYeuCauIDTonguoidung")
+  yeucauthueAsQuanLy      yeucauthue[] @relation("yeucauthue_QuanLyKiemTraIDTonguoidung")
+  yeucauthueAsChuNha      yeucauthue[] @relation("yeucauthue_ChuNhaDuyetIDTonguoidung")
+
+  // Chuyển nhượng
+  chuyennhuongAsNguoiThueCu  chuyennhuong[] @relation("chuyennhuong_NguoiThueCuIDTonguoidung")
+  chuyennhuongAsNguoiThueMoi chuyennhuong[] @relation("chuyennhuong_NguoiThueMoiIDTonguoidung")
+  chuyennhuongAsQuanLy       chuyennhuong[] @relation("chuyennhuong_QuanLyDuyetIDTonguoidung")
+  chuyennhuongAsChuNha       chuyennhuong[] @relation("chuyennhuong_ChuNhaDuyetIDTonguoidung")
+
+  // Tin nhắn hệ thống
+  tinNhanGui  tinnhanhethong[] @relation("tinnhanhethong_NguoiGuiIDTonguoidung")
+  tinNhanNhan tinnhanhethong[] @relation("tinnhanhethong_NguoiNhanIDTonguoidung")
+
+  @@index([SoGiayTo])
+  @@index([QuocTich])
+}
+
+model refreshtokens {
+  ID              Int       @id @default(autoincrement())
+  UserID          Int
+  Token           String    @db.VarChar(512)
+  ExpiresAt       DateTime  @db.DateTime(0)
+  RevokedAt       DateTime? @db.DateTime(0)
+  ReplacedByToken String?   @db.VarChar(512)
+  IPAddress       String?   @db.VarChar(45)
+  UserAgent       String?   @db.Text
+  CreatedAt       DateTime? @default(now()) @db.DateTime(0)
+
+  nguoidung nguoidung @relation(fields: [UserID], references: [ID], onDelete: Cascade)
+
+  @@index([UserID])
+}
+
+model roles {
+  ID        Int         @id @default(autoincrement())
+  TenVaiTro String      @unique @db.VarChar(50)
+  MoTa      String?     @db.VarChar(150)
+  CreatedAt DateTime?   @default(now()) @db.Timestamp(0)
+  userroles userroles[]
+}
+
+model statushistory {
+  ID         Int                      @id @default(autoincrement())
+  EntityType statushistory_EntityType
+  EntityID   Int
+  OldStatus  String                   @db.VarChar(50)
+  NewStatus  String                   @db.VarChar(50)
+  ChangedBy  Int?
+  ChangedAt  DateTime?                @default(now()) @db.DateTime(0)
+  GhiChu     String?                  @db.Text
+
+  nguoidung nguoidung? @relation(fields: [ChangedBy], references: [ID])
+
+  @@index([ChangedBy])
+}
+
+model systemlogs {
+  ID          Int       @id @default(autoincrement())
+  UserID      Int?
+  Action      String    @db.VarChar(100)
+  EntityType  String?   @db.VarChar(50)
+  EntityID    Int?
+  Description String?   @db.Text
+  IPAddress   String?   @db.VarChar(45)
+  UserAgent   String?   @db.Text
+  CreatedAt   DateTime? @default(now()) @db.DateTime(0)
+
+  nguoidung nguoidung? @relation(fields: [UserID], references: [ID])
+
+  @@index([UserID])
+}
+
+model thanhtoan {
+  ID            Int                  @id @default(autoincrement())
+  HoaDonID      Int
+  SoTien        Decimal              @db.Decimal(15, 2)
+  NgayThanhToan DateTime?            @default(now()) @db.DateTime(0)
+  MaGiaoDich    String?              @db.VarChar(100)
+  PhuongThuc    thanhtoan_PhuongThuc
+  NganHang      String?              @db.VarChar(50)
+  XacNhanBoID   Int?
+  GhiChu        String?              @db.Text
+
+  hoadon    hoadon     @relation(fields: [HoaDonID], references: [ID], onDelete: NoAction)
+  nguoidung nguoidung? @relation(fields: [XacNhanBoID], references: [ID], onDelete: NoAction)
+
+  @@index([XacNhanBoID])
+  @@index([HoaDonID])
+}
+
+model thongbao {
+  ID         Int           @id @default(autoincrement())
+  TieuDe     String        @db.VarChar(200)
+  NoiDung    String        @db.Text
+  Loai       thongbao_Loai
+  NguoiGuiID Int
+  NgayGui    DateTime?     @default(now()) @db.DateTime(0)
+
+  nguoidung          nguoidung            @relation(fields: [NguoiGuiID], references: [ID], onDelete: NoAction)
+  thongbao_nguoinhan thongbao_nguoinhan[]
+
+  @@index([NguoiGuiID])
+}
+
+model thongbao_nguoinhan {
+  ThongBaoID  Int
+  NguoiNhanID Int
+  DaDoc       Boolean? @default(false)
+
+  thongbao  thongbao  @relation(fields: [ThongBaoID], references: [ID], onDelete: Cascade)
+  nguoidung nguoidung @relation(fields: [NguoiNhanID], references: [ID], onDelete: Cascade)
+
+  @@id([ThongBaoID, NguoiNhanID])
+  @@index([NguoiNhanID])
+}
+
+model tienich {
+  ID            Int             @id @default(autoincrement())
+  TenTienIch    String          @unique @db.VarChar(100)
+  MoTa          String?         @db.Text
+  canho_tienich canho_tienich[]
+}
+
+model tinnhanchatbot {
+  ID              Int                         @id @default(autoincrement())
+  CuocTroChuyenID Int
+  LoaiNguoiGui    tinnhanchatbot_LoaiNguoiGui
+  NoiDung         String                      @db.Text
+  ThoiGian        DateTime?                   @default(now()) @db.DateTime(0)
+
+  cuoctrochuyen cuoctrochuyen @relation(fields: [CuocTroChuyenID], references: [ID], onDelete: Cascade)
+
+  @@index([CuocTroChuyenID])
+}
+
+model tinnhanhethong {
+  ID          Int       @id @default(autoincrement())
+  NguoiGuiID  Int
+  NguoiNhanID Int
+  NoiDung     String    @db.Text
+  ThoiGian    DateTime? @default(now()) @db.DateTime(0)
+  DaDoc       Boolean?  @default(false)
+
+  nguoidung_tinnhanhethong_NguoiGuiIDTonguoidung  nguoidung @relation("tinnhanhethong_NguoiGuiIDTonguoidung", fields: [NguoiGuiID], references: [ID])
+  nguoidung_tinnhanhethong_NguoiNhanIDTonguoidung nguoidung @relation("tinnhanhethong_NguoiNhanIDTonguoidung", fields: [NguoiNhanID], references: [ID])
+
+  @@index([NguoiGuiID])
+  @@index([NguoiNhanID])
+}
+
+model toanha {
+  ID        Int       @id @default(autoincrement())
+  TenToaNha String    @db.VarChar(100)
+  DiaChi    String    @db.VarChar(255)
+  SoTang    Int
+  ChuNhaID  Int
+  NgayTao   DateTime? @default(now()) @db.Timestamp(0)
+
+  canho     canho[]
+  nguoidung nguoidung @relation(fields: [ChuNhaID], references: [ID], onDelete: NoAction)
+
+  @@index([ChuNhaID])
+}
+
+model userroles {
+  NguoiDungID Int
+  RoleID      Int
+
+  nguoidung nguoidung @relation(fields: [NguoiDungID], references: [ID], onDelete: Cascade)
+  roles     roles     @relation(fields: [RoleID], references: [ID], onDelete: Cascade)
+
+  @@id([NguoiDungID, RoleID])
+  @@index([RoleID])
+}
+
+model yeucaudichvu {
+  ID          Int                     @id @default(autoincrement())
+  NguoiThueID Int
+  DichVuID    Int
+  CanHoID     Int
+  NgayYeuCau  DateTime?               @default(now()) @db.DateTime(0)
+  TrangThai   yeucaudichvu_TrangThai? @default(ChoXuLy)
+  GhiChu      String?                 @db.Text
+
+  nguoidung nguoidung @relation(fields: [NguoiThueID], references: [ID])
+  dichvu    dichvu    @relation(fields: [DichVuID], references: [ID])
+  canho     canho     @relation(fields: [CanHoID], references: [ID])
+
+  @@index([CanHoID])
+  @@index([DichVuID])
+  @@index([NguoiThueID])
+}
+
+model yeucausuco {
+  ID             Int                   @id @default(autoincrement())
+  NguoiThueID    Int
+  CanHoID        Int
+  TieuDe         String                @db.VarChar(200)
+  MoTa           String                @db.Text
+  DoUuTien       yeucausuco_DoUuTien?  @default(Trung)
+  NgayBao        DateTime?             @default(now()) @db.DateTime(0)
+  TrangThai      yeucausuco_TrangThai? @default(Moi)
+  QuanLyNhanID   Int?
+  NhanVienXuLyID Int?
+  NgayXuLy       DateTime?             @db.DateTime(0)
+  KetQua         String?               @db.Text
+
+  nguoidung_yeucausuco_NguoiThueIDTonguoidung    nguoidung  @relation("yeucausuco_NguoiThueIDTonguoidung", fields: [NguoiThueID], references: [ID])
+  canho                                          canho      @relation(fields: [CanHoID], references: [ID])
+  nguoidung_yeucausuco_QuanLyNhanIDTonguoidung   nguoidung? @relation("yeucausuco_QuanLyNhanIDTonguoidung", fields: [QuanLyNhanID], references: [ID])
+  nguoidung_yeucausuco_NhanVienXuLyIDTonguoidung nguoidung? @relation("yeucausuco_NhanVienXuLyIDTonguoidung", fields: [NhanVienXuLyID], references: [ID])
+
+  @@index([CanHoID])
+  @@index([NguoiThueID])
+  @@index([NhanVienXuLyID])
+  @@index([QuanLyNhanID])
+  @@index([TrangThai])
+}
+
+model yeucauthue {
+  ID              Int                   @id @default(autoincrement())
+  NguoiYeuCauID   Int
+  CanHoID         Int
+  NgayYeuCau      DateTime?             @default(now()) @db.DateTime(0)
+  TrangThai       yeucauthue_TrangThai? @default(ChoKiemTra)
+  GhiChu          String?               @db.Text
+  QuanLyKiemTraID Int?
+  ChuNhaDuyetID   Int?
+
+  hopdong                                         hopdong[]
+  nguoidung_yeucauthue_NguoiYeuCauIDTonguoidung   nguoidung  @relation("yeucauthue_NguoiYeuCauIDTonguoidung", fields: [NguoiYeuCauID], references: [ID])
+  canho                                           canho      @relation(fields: [CanHoID], references: [ID])
+  nguoidung_yeucauthue_QuanLyKiemTraIDTonguoidung nguoidung? @relation("yeucauthue_QuanLyKiemTraIDTonguoidung", fields: [QuanLyKiemTraID], references: [ID])
+  nguoidung_yeucauthue_ChuNhaDuyetIDTonguoidung   nguoidung? @relation("yeucauthue_ChuNhaDuyetIDTonguoidung", fields: [ChuNhaDuyetID], references: [ID])
+
+  @@index([CanHoID])
+  @@index([ChuNhaDuyetID])
+  @@index([NguoiYeuCauID])
+  @@index([QuanLyKiemTraID])
+}
