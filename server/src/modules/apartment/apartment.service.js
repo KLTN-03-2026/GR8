@@ -13,8 +13,8 @@ export const getAllApartments = async (filters = {}) => {
       ...(maxGia && { GiaThue: { lte: new Prisma.Decimal(maxGia) } }),
       ...(search && {
         OR: [
-          { MaCanHo: { contains: search, mode: "insensitive" } },
-          { MoTa: { contains: search, mode: "insensitive" } },
+          { MaCanHo: { contains: search } },
+          { MoTa: { contains: search } },
         ],
       }),
     },
