@@ -52,16 +52,16 @@ export const login = async (req, res) => {
 
     const user = await authService.loginUser(TenDangNhapOrEmail, MatKhau);
 
-    // Tạo JWT token
+    // Tạo JWT token — dùng TenVaiTro từ bảng roles thay vì VaiTro cũ
     const token = jwt.sign(
       { 
         ID: user.ID,
         TenDangNhap: user.TenDangNhap,
         Email: user.Email,
-        VaiTro: user.VaiTro 
+        VaiTro: user.roles?.TenVaiTro || null
       },
       JWT_SECRET,
-      { expiresIn: "7d" }   // Token hết hạn sau 7 ngày
+      { expiresIn: "7d" }
     );
 
     res.status(200).json({
@@ -72,7 +72,7 @@ export const login = async (req, res) => {
           ID: user.ID,
           HoTen: user.HoTen,
           Email: user.Email,
-          VaiTro: user.VaiTro,
+          VaiTro: user.roles?.TenVaiTro || null,
           TrangThai: user.TrangThai
         },
         token
