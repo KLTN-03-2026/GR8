@@ -1,7 +1,12 @@
 // server/src/modules/auth/auth.middleware.js
 import jwt from "jsonwebtoken";
+import { ALL_ROLES } from "../../constants/roles.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error("Missing JWT_SECRET in environment variables");
+}
 
 export const protect = async (req, res, next) => {
   try {
@@ -22,6 +27,13 @@ export const protect = async (req, res, next) => {
     // Xác thực token
     const decoded = jwt.verify(token, JWT_SECRET);
 
+    if (!decoded?.ID) {
+      return res.status(401).json({
+        success: false,
+        message: "Token không hợp lệ",
+      });
+    }
+
     // Gắn thông tin user vào request
     req.user = decoded;
 
@@ -41,6 +53,13 @@ export const authorize = (...allowedRoles) => {
       return res.status(403).json({
         success: false,
         message: "Không có quyền truy cập"
+      });
+    }
+
+    if (!ALL_ROLES.includes(req.user.VaiTro)) {
+      return res.status(403).json({
+        success: false,
+        message: "Vai trò không hợp lệ",
       });
     }
 

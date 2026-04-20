@@ -223,6 +223,7 @@ model nguoidung {
   cuoctrochuyen                                        cuoctrochuyen[]
   hopdong                                              hopdong[]
   media                                                media[]
+  passwordresettokens                                  passwordresettokens[]
   roles                                                roles?                @relation(fields: [RoleID], references: [ID], onDelete: Restrict, map: "fk_nguoidung_roles")
   refreshtokens                                        refreshtokens[]
   statushistory                                        statushistory[]
@@ -261,6 +262,19 @@ model refreshtokens {
   nguoidung       nguoidung @relation(fields: [UserID], references: [ID], onDelete: Cascade)
 
   @@index([UserID])
+}
+
+model passwordresettokens {
+  ID        Int       @id @default(autoincrement())
+  UserID    Int
+  Token     String    @db.VarChar(512)
+  ExpiresAt DateTime  @db.DateTime(0)
+  UsedAt    DateTime? @db.DateTime(0)
+  CreatedAt DateTime? @default(now()) @db.DateTime(0)
+  nguoidung nguoidung @relation(fields: [UserID], references: [ID], onDelete: Cascade)
+
+  @@index([UserID])
+  @@index([Token])
 }
 
 model roles {
