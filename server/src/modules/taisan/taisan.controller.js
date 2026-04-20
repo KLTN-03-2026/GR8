@@ -34,3 +34,10 @@ export const remove = async (req, res) => {
     res.json({ success: true, ...data });
   } catch (e) { res.status(e.statusCode || 400).json({ success: false, message: e.message }); }
 };
+
+export const thongKe = async (req, res) => {
+  try {
+    const data = await service.getThongKeTaiSan();
+    res.json({ success: true, data });
+  } catch (e) { res.status(e.statusCode || 500).json({ success: false, message: e.message }); }
+};

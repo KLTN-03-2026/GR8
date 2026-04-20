@@ -145,4 +145,18 @@ router.put("/:id", protect, authorize("QuanLy", "ChuNha"), controller.update);
  */
 router.delete("/:id", protect, authorize("QuanLy", "ChuNha"), controller.remove);
 
+/**
+ * @swagger
+ * /api/taisan/stats/thongke:
+ *   get:
+ *     summary: Thống kê tài sản
+ *     tags: [Tài sản]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Thống kê thành công
+ */
+router.get("/stats/thongke", protect, authorize("QuanLy"), controller.thongKe);
+
 export default router;

@@ -21,6 +21,11 @@ export const getAllApartments = async (filters = {}) => {
     include: {
       toanha: true,
       nguoidung: { select: { HoTen: true, Email: true } },
+      canho_tienich: {
+        include: {
+          tienich: true
+        }
+      }
     },
     orderBy: { ID: "desc" },
   });
@@ -32,6 +37,11 @@ export const getApartmentById = async (id) => {
     include: {
       toanha: true,
       nguoidung: { select: { HoTen: true, Email: true, SoDienThoai: true } },
+      canho_tienich: {
+        include: {
+          tienich: true
+        }
+      }
     },
   });
 
