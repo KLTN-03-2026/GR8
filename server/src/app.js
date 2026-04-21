@@ -12,7 +12,9 @@ import toanhaRoutes from "./modules/toanha/toanha.route.js";
 import tienichRoutes from "./modules/tienich/tienich.route.js";
 import taisanRoutes from "./modules/taisan/taisan.route.js";
 import theguixeRoutes from "./modules/theguixe/theguixe.route.js";
-
+import yeuCauThueRoute from "./modules/yeucauthue/yeucauthue.route.js";
+import hopdongRoute from "./modules/hopdong/hopdong.route.js";
+import chuyennhuongRoute from "./modules/chuyennhuong/chuyennhuong.route.js";
 const app = express();
 
 app.use(cors());
@@ -30,5 +32,7 @@ app.use("/api/toanha", toanhaRoutes);
 app.use("/api/tienich", tienichRoutes);
 app.use("/api/taisan", taisanRoutes);
 app.use("/api/theguixe", theguixeRoutes);
-
+app.use("/api/yeucauthue", yeuCauThueRoute);
+app.use("/api/hopdong", hopdongRoute);
+app.use("/api/chuyennhuong", chuyennhuongRoute);
 export default app;

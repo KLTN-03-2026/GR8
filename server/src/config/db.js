@@ -3,8 +3,8 @@ const mysql = require("mysql2");
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "240536",
-  database: "quanlychungcu"
+  password: "123456",
+  database: process.env.DB_NAME || "db_qlcc"
 });
 
 db.connect((err) => {
@@ -12,7 +12,7 @@ db.connect((err) => {
     console.error("Lỗi kết nối DB:", err);
     return;
   }
-  console.log("Kết nối MySQL thành công ✅");
+  console.log("Kết nối MySQL thành công");
 });
 
 module.exports = db;
