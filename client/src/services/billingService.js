@@ -31,10 +31,13 @@ export const getPendingMeterReadings = async (params = {}) => {
   return response.data;
 };
 
-export const confirmAndGenerateInvoice = async (id, data) => {
+export const confirmReading = async (id, data) => {
   const response = await api.post(`/chisodiennuoc/${id}/confirm`, data);
   return response.data;
 };
+
+// Alias for backward compatibility
+export const confirmAndGenerateInvoice = confirmReading;
 
 // ============================================
 // BƯỚC 3: Người thuê xem & thanh toán
@@ -45,15 +48,20 @@ export const getMyInvoices = async (params = {}) => {
   return response.data;
 };
 
-export const getInvoiceById = async (id) => {
+export const getInvoiceDetail = async (id) => {
   const response = await api.get(`/hoadon/${id}`);
   return response.data;
 };
+
+// Alias for backward compatibility
+export const getInvoiceById = getInvoiceDetail;
 
 export const markInvoiceAsPaid = async (id, data = {}) => {
   const response = await api.post(`/hoadon/${id}/mark-paid`, data);
   return response.data;
 };
+
+export const getPendingReadings = getPendingMeterReadings;
 
 // ============================================
 // Manager/Accountant - Xem tất cả hóa đơn

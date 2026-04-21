@@ -56,20 +56,10 @@ export const managerApprove = async (id, userId) => {
     if (!record) throw new Error("Yêu cầu thuê không tồn tại");
     if (record.TrangThai !== "ChoKiemTra") throw new Error("Yêu cầu không ở trạng thái chờ kiểm tra");
 
+    // Admin duyệt trực tiếp, không cần chủ nhà duyệt nữa
     return await prisma.yeucauthue.update({
         where: { ID: Number(id) },
-        data: { TrangThai: "ChoDuyet", QuanLyKiemTraID: userId }
-    });
-};
-
-export const ownerApprove = async (id, userId) => {
-    const record = await prisma.yeucauthue.findUnique({ where: { ID: Number(id) } });
-    if (!record) throw new Error("Yêu cầu thuê không tồn tại");
-    if (record.TrangThai !== "ChoDuyet") throw new Error("Yêu cầu chưa qua bước kiểm tra của quản lý");
-
-    return await prisma.yeucauthue.update({
-        where: { ID: Number(id) },
-        data: { TrangThai: "DaDuyet", ChuNhaDuyetID: userId }
+        data: { TrangThai: "DaDuyet", QuanLyKiemTraID: userId }
     });
 };
 
@@ -78,12 +68,9 @@ export const rejectRequest = async (id, userId, role) => {
     if (!record) throw new Error("Yêu cầu thuê không tồn tại");
     if (record.TrangThai === "DaDuyet") throw new Error("Không thể từ chối yêu cầu đã được duyệt");
 
-    // Quản lý chỉ từ chối được khi đang ChoKiemTra, ChuNha từ chối khi ChoDuyet
-    if (role === "QuanLy" && record.TrangThai !== "ChoKiemTra") {
-        throw new Error("Quản lý chỉ có thể từ chối yêu cầu đang chờ kiểm tra");
-    }
-    if (role === "ChuNha" && record.TrangThai !== "ChoDuyet") {
-        throw new Error("Chủ nhà chỉ có thể từ chối yêu cầu đang chờ duyệt");
+    // Chỉ Quản lý có thể từ chối
+    if (record.TrangThai !== "ChoKiemTra") {
+        throw new Error("Chỉ có thể từ chối yêu cầu đang chờ kiểm tra");
     }
 
     return await prisma.yeucauthue.update({

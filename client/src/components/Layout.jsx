@@ -10,29 +10,81 @@ const Layout = ({ children }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
 
-  const menuItems = [
-    {
-      key: "/",
-      label: "Trang chủ",
-    },
-    {
-      key: "/apartments",
-      label: "Căn hộ",
-    },
-    {
-      key: "/amenities",
-      label: "Tiện ích",
-    },
-    {
-      key: "/assets",
-      label: "Tài sản",
-    },
-  ];
+  // Role-based menu items configuration
+  const getRoleBasedMenuItems = (role) => {
+    const allItems = {
+      home:              { key: "/",                label: "Trang chủ" },
+      dashboard:         { key: "/dashboard",       label: "Dashboard" },
+      // Admin
+      apartments:        { key: "/apartments",      label: "Căn hộ" },
+      amenities:         { key: "/amenities",       label: "Tiện ích" },
+      assets:            { key: "/assets",          label: "Tài sản" },
+      users:             { key: "/users",           label: "Người dùng" },
+      contracts:         { key: "/contracts",       label: "Hợp đồng" },
+      rentalRequests:    { key: "/yeucauthue",      label: "Yêu cầu thuê" },
+      invoiceAll:        { key: "/hoadon-all",      label: "Hóa đơn" },
+      // Billing
+      meterReading:      { key: "/meter-reading",   label: "Ghi chỉ số" },
+      pendingReadings:   { key: "/pending-readings",label: "Duyệt chỉ số" },
+      // Tenant
+      browseApartments:  { key: "/browse-apartments",   label: "Tìm căn hộ" },
+      myRentalRequests:  { key: "/my-rental-requests",  label: "Yêu cầu của tôi" },
+      myContracts:       { key: "/my-contracts",        label: "Hợp đồng" },
+      myInvoices:        { key: "/my-invoices",         label: "Hóa đơn" },
+    };
+
+    const roleMenus = {
+      QuanLy: [
+        allItems.home, allItems.dashboard,
+        allItems.apartments, allItems.amenities, allItems.assets,
+        allItems.rentalRequests, allItems.contracts,
+        allItems.meterReading, allItems.pendingReadings, allItems.invoiceAll,
+        allItems.users,
+      ],
+      KeToan: [
+        allItems.home, allItems.dashboard,
+        allItems.pendingReadings, allItems.invoiceAll,
+      ],
+      NhanVienKyThuat: [
+        allItems.home, allItems.dashboard,
+        allItems.meterReading, allItems.assets,
+      ],
+      ChuNha: [
+        allItems.home, allItems.dashboard,
+      ],
+      NguoiThue: [
+        allItems.home, allItems.dashboard,
+        allItems.browseApartments, allItems.myRentalRequests,
+        allItems.myContracts, allItems.myInvoices,
+      ],
+      KhachVangLai: [
+        allItems.home,
+        allItems.browseApartments, allItems.myRentalRequests,
+      ],
+    };
+
+    return roleMenus[role] || [allItems.home, allItems.dashboard];
+  };
+
+  const menuItems = user ? getRoleBasedMenuItems(user.roles?.TenVaiTro || user.VaiTro) : [];
+
+  const getRoleLabel = (role) => {
+    const roleLabels = {
+      KeToan: "Kế Toán",
+      NhanVienKyThuat: "Nhân Viên Kỹ Thuật",
+      QuanLy: "Quản Lý",
+      ChuNha: "Chủ Nhà",
+      NguoiThue: "Người Thuê",
+      KhachVangLai: "Khách Vãng Lai",
+    };
+    return roleLabels[role] || "Người Dùng";
+  };
 
   const userMenuItems = [
     {
       key: "profile",
       label: "Thông tin cá nhân",
+      onClick: () => navigate("/profile"),
     },
     {
       type: "divider",
@@ -89,8 +141,11 @@ const Layout = ({ children }) => {
                 <Avatar style={{ backgroundColor: "#1890ff" }}>
                   {user.HoTen?.charAt(0) || "U"}
                 </Avatar>
-                <span style={{ color: "white" }}>
-                  {user.HoTen} ({user.VaiTro || "User"})
+                <span style={{ color: "white", fontSize: "14px" }}>
+                  <div>{user.HoTen}</div>
+                  <div style={{ fontSize: "12px", opacity: 0.8 }}>
+                    {getRoleLabel(user.roles?.TenVaiTro || user.VaiTro)}
+                  </div>
                 </span>
               </div>
             </Dropdown>

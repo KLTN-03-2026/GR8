@@ -39,16 +39,7 @@ export const getMyRequests = async (req, res) => {
 export const managerApprove = async (req, res) => {
     try {
         const data = await service.managerApprove(req.params.id, req.user.ID);
-        res.json({ success: true, message: "Quản lý đã duyệt kiểm tra", data });
-    } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
-    }
-};
-
-export const ownerApprove = async (req, res) => {
-    try {
-        const data = await service.ownerApprove(req.params.id, req.user.ID);
-        res.json({ success: true, message: "Chủ nhà đã duyệt yêu cầu thuê", data });
+        res.json({ success: true, message: "Đã duyệt yêu cầu thuê thành công", data });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }

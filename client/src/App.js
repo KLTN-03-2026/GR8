@@ -9,11 +9,25 @@ import Login from "./pages/Login";
 import Apartments from "./pages/Apartments";
 import Assets from "./pages/Assets";
 import Amenities from "./pages/Amenities";
+import Dashboard from "./pages/dashboard/Dashboard";
+import Profile from "./pages/Profile";
 
-// Import billing components
+// Billing workflow
 import MeterReadingForm from './pages/chisodiennuoc/MeterReadingForm';
 import PendingReadingsList from './pages/chisodiennuoc/PendingReadingsList';
 import MyInvoicesList from './pages/hoadon/MyInvoicesList';
+
+// Tenant pages
+import HopDongList from './pages/hopdong/HopDongList';
+import MyContracts from './pages/hopdong/MyContracts';
+import YeuCauThueList from './pages/yeucauthue/YeuCauThueList';
+import MyRentalRequests from './pages/yeucauthue/MyRentalRequests';
+import BrowseApartments from './pages/canho/BrowseApartments';
+
+// Admin pages
+import UserManagement from './pages/admin/UserManagement';
+import ContractManagement from './pages/admin/ContractManagement';
+import InvoiceManagement from './pages/admin/InvoiceManagement';
 
 import "./App.css";
 
@@ -56,7 +70,7 @@ function AppContent() {
       <Route
         path="/apartments"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['QuanLy', 'ChuNha', 'NhanVienKyThuat']}>
             <Layout>
               <Apartments />
             </Layout>
@@ -67,7 +81,7 @@ function AppContent() {
       <Route
         path="/assets"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['QuanLy', 'ChuNha']}>
             <Layout>
               <Assets />
             </Layout>
@@ -78,7 +92,7 @@ function AppContent() {
       <Route
         path="/amenities"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['QuanLy', 'ChuNha', 'NhanVienKyThuat']}>
             <Layout>
               <Amenities />
             </Layout>
@@ -129,6 +143,130 @@ function AppContent() {
       {/* ============================================ */}
       {/* END BILLING WORKFLOW ROUTES                  */}
       {/* ============================================ */}
+
+      {/* Dashboard */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Dashboard />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Contracts Management - Admin */}
+      <Route
+        path="/hopdong"
+        element={
+          <ProtectedRoute allowedRoles={['QuanLy']}>
+            <Layout>
+              <ContractManagement />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* My Contracts - For Tenants */}
+      <Route
+        path="/my-contracts"
+        element={
+          <ProtectedRoute allowedRoles={['NguoiThue']}>
+            <Layout>
+              <MyContracts />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Rental Requests Management - For Admin */}
+      <Route
+        path="/yeucauthue"
+        element={
+          <ProtectedRoute allowedRoles={['QuanLy', 'ChuNha']}>
+            <Layout>
+              <YeuCauThueList />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* My Rental Requests - For Tenants */}
+      <Route
+        path="/my-rental-requests"
+        element={
+          <ProtectedRoute allowedRoles={['NguoiThue', 'KhachHang']}>
+            <Layout>
+              <MyRentalRequests />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Browse Apartments - For Tenants */}
+      <Route
+        path="/browse-apartments"
+        element={
+          <ProtectedRoute allowedRoles={['NguoiThue', 'KhachHang']}>
+            <Layout>
+              <BrowseApartments />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* User Profile */}
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Profile />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ============================================ */}
+      {/* ADMIN ROUTES                                 */}
+      {/* ============================================ */}
+
+      {/* Quản lý người dùng */}
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute allowedRoles={['QuanLy']}>
+            <Layout>
+              <UserManagement />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Quản lý hợp đồng (admin) */}
+      <Route
+        path="/contracts"
+        element={
+          <ProtectedRoute allowedRoles={['QuanLy']}>
+            <Layout>
+              <ContractManagement />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Quản lý hóa đơn (admin/ketoan) */}
+      <Route
+        path="/hoadon-all"
+        element={
+          <ProtectedRoute allowedRoles={['QuanLy', 'KeToan']}>
+            <Layout>
+              <InvoiceManagement />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
