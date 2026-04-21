@@ -1,0 +1,356 @@
+{
+  "info": {
+    "name": "Billing Workflow API - 3 Steps",
+    "description": "API collection for 3-step billing workflow: Technician → Accountant → Tenant",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "STEP 1 - Technician Records Meter",
+      "item": [
+        {
+          "name": "Create Meter Reading",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_technician}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"CanHoID\": 1,\n  \"ThangNam\": \"2024-04\",\n  \"ChiSoDienMoi\": 1250.5,\n  \"ChiSoNuocMoi\": 85.3,\n  \"AnhDongHoDien\": \"https://storage.example.com/meter-electric-001.jpg\",\n  \"AnhDongHoNuoc\": \"https://storage.example.com/meter-water-001.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/chisodiennuoc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chisodiennuoc"]
+            },
+            "description": "Nhân viên kỹ thuật ghi chỉ số điện nước và upload ảnh đồng hồ"
+          }
+        },
+        {
+          "name": "Get All Meter Readings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chisodiennuoc?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chisodiennuoc"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "ThangNam",
+                  "value": "2024-04",
+                  "disabled": true
+                },
+                {
+                  "key": "CanHoID",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Meter Reading by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chisodiennuoc/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chisodiennuoc", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "STEP 2 - Accountant Confirms & Generates Invoice",
+      "item": [
+        {
+          "name": "Get Pending Meter Readings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_accountant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chisodiennuoc/pending?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chisodiennuoc", "pending"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "ThangNam",
+                  "value": "2024-04",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Kế toán xem danh sách chỉ số chờ duyệt"
+          }
+        },
+        {
+          "name": "Confirm & Generate Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_accountant}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ChiSoDienChinhThuc\": 1250.5,\n  \"ChiSoNuocChinhThuc\": 85.3,\n  \"GhiChuKeToan\": \"Đã kiểm tra ảnh, chỉ số chính xác\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/chisodiennuoc/:id/confirm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chisodiennuoc", ":id", "confirm"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Kế toán xác nhận chỉ số và hệ thống tự động phát hành hóa đơn"
+          }
+        }
+      ]
+    },
+    {
+      "name": "STEP 3 - Tenant Views & Pays Invoice",
+      "item": [
+        {
+          "name": "Get My Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hoadon/my-invoices?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hoadon", "my-invoices"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "TrangThai",
+                  "value": "ChuaTT",
+                  "disabled": true
+                },
+                {
+                  "key": "ThangNam",
+                  "value": "2024-04",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Người thuê xem danh sách hóa đơn của mình"
+          }
+        },
+        {
+          "name": "Get Invoice Detail with QR",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_tenant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hoadon/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hoadon", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Xem chi tiết hóa đơn với QR code VietQR"
+          }
+        },
+        {
+          "name": "Mark Invoice as Paid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_tenant}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"PhuongThuc\": \"ChuyenKhoan\",\n  \"MaGiaoDich\": \"FT24042112345678\",\n  \"NganHang\": \"Vietcombank\",\n  \"GhiChu\": \"Đã chuyển khoản lúc 14:30\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hoadon/:id/mark-paid",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hoadon", ":id", "mark-paid"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Người thuê đánh dấu đã thanh toán sau khi chuyển khoản"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Manager/Accountant - View All Invoices",
+      "item": [
+        {
+          "name": "Get All Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_accountant}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hoadon?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hoadon"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "TrangThai",
+                  "value": "ChuaTT",
+                  "disabled": true
+                },
+                {
+                  "key": "ThangNam",
+                  "value": "2024-04",
+                  "disabled": true
+                },
+                {
+                  "key": "HopDongID",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Quản lý/Kế toán xem tất cả hóa đơn"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    },
+    {
+      "key": "token_technician",
+      "value": "jwt_token_for_technician",
+      "type": "string"
+    },
+    {
+      "key": "token_accountant",
+      "value": "jwt_token_for_accountant",
+      "type": "string"
+    },
+    {
+      "key": "token_tenant",
+      "value": "jwt_token_for_tenant",
+      "type": "string"
+    }
+  ]
+}

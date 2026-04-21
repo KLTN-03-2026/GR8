@@ -13,7 +13,14 @@ export const notFoundHandler = (req, _res, next) => {
 };
 
 export const globalErrorHandler = (error, _req, res, _next) => {
+  console.error("🔴 ERROR CAUGHT:", {
+    message: error.message,
+    code: error.code,
+    stack: error.stack,
+  });
+
   if (error instanceof ZodError) {
+    console.error("📋 Zod validation error:", error.issues);
     return res.status(400).json({
       success: false,
       message: "Dữ liệu không hợp lệ",
@@ -31,6 +38,11 @@ export const globalErrorHandler = (error, _req, res, _next) => {
     });
   }
 
+  // Handle Prisma errors
+  if (error?.code?.startsWith("P")) {
+    console.error("🗄️ Prisma error:", error.code, error.message);
+  }
+
   const statusCode = error.statusCode || 500;
   const message = statusCode >= 500 ? "Đã có lỗi xảy ra trên hệ thống" : error.message;
 
@@ -38,5 +50,6 @@ export const globalErrorHandler = (error, _req, res, _next) => {
     success: false,
     message,
     ...(error.details ? { details: error.details } : {}),
+    ...(process.env.NODE_ENV !== "production" ? { debug: error.message } : {}),
   });
 };

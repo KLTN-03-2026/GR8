@@ -1,0 +1,21 @@
+{
+  "name": "apartment-management-system",
+  "version": "1.0.0",
+  "description": "Apartment Management System - Full Stack Application",
+  "scripts": {
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "dev": "echo 'Please run server and client in separate terminals' && echo 'Terminal 1: npm run server' && echo 'Terminal 2: npm run client'"
+  },
+  "keywords": [
+    "apartment",
+    "management",
+    "react",
+    "nodejs",
+    "express",
+    "prisma"
+  ],
+  "author": "",
+  "license": "ISC"
+}

@@ -15,8 +15,38 @@ const apartmentPublicSelect = {
   TrangThai: true,
   MoTa: true,
   ChuNhaID: true,
-  toanha: true,
-  nguoidung: { select: { HoTen: true } },
+  toanha: {
+    select: {
+      ID: true,
+      TenToaNha: true,
+    },
+  },
+  nguoidung: { 
+    select: { 
+      ID: true,
+      HoTen: true 
+    } 
+  },
+  hopdong: {
+    where: {
+      is_deleted: 0,
+      TrangThai: "DangThue", // Only active contracts
+    },
+    select: {
+      ID: true,
+      NguoiThueID: true,
+      NgayBatDau: true,
+      NgayKetThuc: true,
+      TrangThai: true,
+      nguoidung: {
+        select: {
+          ID: true,
+          HoTen: true,
+        },
+      },
+    },
+    take: 1, // Only get the current/active contract
+  },
 };
 
 const assertApartmentOwnershipOrManager = (apartment, actor) => {
@@ -29,44 +59,63 @@ const assertApartmentOwnershipOrManager = (apartment, actor) => {
 };
 
 export const getAllApartments = async (filters = {}) => {
-  const { page, limit, ToaNhaID, TrangThai, minGia, maxGia, search } = filters;
-  const skip = (page - 1) * limit;
-  const where = {
-    is_deleted: 0,
-    ...(ToaNhaID && { ToaNhaID: Number(ToaNhaID) }),
-    ...(TrangThai && { TrangThai }),
-    ...(minGia !== undefined && { GiaThue: { gte: new Prisma.Decimal(minGia) } }),
-    ...(maxGia !== undefined && {
-      GiaThue: {
-        ...(minGia !== undefined ? { gte: new Prisma.Decimal(minGia) } : {}),
-        lte: new Prisma.Decimal(maxGia),
+  try {
+    // Set default values
+    const page = Math.max(1, parseInt(filters.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(filters.limit) || 10));
+    const skip = (page - 1) * limit;
+    
+    console.log("📋 Fetching apartments with filters:", { page, limit, skip, ...filters });
+    
+    const { ToaNhaID, TrangThai, minGia, maxGia, search } = filters;
+    const where = {
+      is_deleted: 0,
+      ...(ToaNhaID && { ToaNhaID: Number(ToaNhaID) }),
+      ...(TrangThai && { TrangThai }),
+      ...(minGia !== undefined && { GiaThue: { gte: new Prisma.Decimal(minGia) } }),
+      ...(maxGia !== undefined && {
+        GiaThue: {
+          ...(minGia !== undefined ? { gte: new Prisma.Decimal(minGia) } : {}),
+          lte: new Prisma.Decimal(maxGia),
+        },
+      }),
+      ...(search && {
+        OR: [{ MaCanHo: { contains: search } }, { MoTa: { contains: search } }],
+      }),
+    };
+
+    console.log("🔍 WHERE clause:", JSON.stringify(where, null, 2));
+
+    const [items, total] = await prisma.$transaction([
+      prisma.canho.findMany({
+        where,
+        skip,
+        take: limit,
+        select: apartmentPublicSelect,
+        orderBy: { ID: "desc" },
+      }),
+      prisma.canho.count({ where }),
+    ]);
+
+    console.log(`✅ Successfully fetched ${items.length} apartments (total: ${total})`);
+
+    return {
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-    }),
-    ...(search && {
-      OR: [{ MaCanHo: { contains: search } }, { MoTa: { contains: search } }],
-    }),
-  };
-
-  const [items, total] = await prisma.$transaction([
-    prisma.canho.findMany({
-      where,
-      skip,
-      take: limit,
-      select: apartmentPublicSelect,
-      orderBy: { ID: "desc" },
-    }),
-    prisma.canho.count({ where }),
-  ]);
-
-  return {
-    items,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-  };
+    };
+  } catch (error) {
+    console.error("❌ Error in getAllApartments:", {
+      message: error.message,
+      code: error.code,
+      prismaError: error.clientVersion,
+    });
+    throw error;
+  }
 };
 
 export const getApartmentById = async (id) => {

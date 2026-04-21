@@ -51,22 +51,32 @@ model canho_tienich {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model chisodiennuoc {
-  ID             Int        @id @default(autoincrement())
-  CanHoID        Int
-  ThangNam       String     @db.VarChar(7)
-  ChiSoDienCu    Decimal?   @default(0.00) @db.Decimal(10, 2)
-  ChiSoDienMoi   Decimal    @db.Decimal(10, 2)
-  ChiSoNuocCu    Decimal?   @default(0.00) @db.Decimal(10, 2)
-  ChiSoNuocMoi   Decimal    @db.Decimal(10, 2)
-  NgayGhi        DateTime?  @default(now()) @db.DateTime(0)
-  NguoiGhiID     Int?
-  thang_nam_date DateTime?  @db.Date
-  canho          canho      @relation(fields: [CanHoID], references: [ID])
-  nguoidung      nguoidung? @relation(fields: [NguoiGhiID], references: [ID])
+  ID                Int                         @id @default(autoincrement())
+  CanHoID           Int
+  ThangNam          String                      @db.VarChar(7)
+  ChiSoDienCu       Decimal?                    @default(0.00) @db.Decimal(10, 2)
+  ChiSoDienMoi      Decimal                     @db.Decimal(10, 2)
+  ChiSoNuocCu       Decimal?                    @default(0.00) @db.Decimal(10, 2)
+  ChiSoNuocMoi      Decimal                     @db.Decimal(10, 2)
+  NgayGhi           DateTime?                   @default(now()) @db.DateTime(0)
+  NguoiGhiID        Int?
+  thang_nam_date    DateTime?                   @db.Date
+  // Workflow fields for 3-step process
+  AnhDongHoDien     String?                     @db.VarChar(500)
+  AnhDongHoNuoc     String?                     @db.VarChar(500)
+  TrangThai         chisodiennuoc_TrangThai?    @default(ChoDuyetKeToan)
+  KeToanDuyetID     Int?
+  NgayKeToanDuyet   DateTime?                   @db.DateTime(0)
+  ChiSoDienChinhThuc Decimal?                   @db.Decimal(10, 2)
+  ChiSoNuocChinhThuc Decimal?                   @db.Decimal(10, 2)
+  GhiChuKeToan      String?                     @db.Text
+  canho             canho                       @relation(fields: [CanHoID], references: [ID])
+  nguoidung         nguoidung?                  @relation(fields: [NguoiGhiID], references: [ID])
 
   @@index([CanHoID])
   @@index([NguoiGhiID])
   @@index([ThangNam], map: "idx_chisodiennuoc_thang")
+  @@index([TrangThai])
 }
 
 model chuyennhuong {
@@ -126,6 +136,12 @@ model hoadon {
   is_deleted     Int?              @default(0) @db.TinyInt
   deleted_at     DateTime?         @db.DateTime(0)
   thang_nam_date DateTime?         @db.Date
+  // VietQR payment info
+  MaHoaDon       String?           @unique @db.VarChar(50)
+  QRContent      String?           @db.Text
+  SoTaiKhoan     String?           @db.VarChar(50)
+  NganHangNhan   String?           @db.VarChar(100)
+  NoiDungCK      String?           @db.VarChar(200)
   hopdong        hopdong           @relation(fields: [HopDongID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
   hoadonchitiet  hoadonchitiet[]
   thanhtoan      thanhtoan[]
@@ -133,6 +149,7 @@ model hoadon {
   @@index([HopDongID])
   @@index([TrangThai])
   @@index([ThangNam], map: "idx_hoadon_thangnam")
+  @@index([MaHoaDon])
 }
 
 model hoadonchitiet {
@@ -678,4 +695,11 @@ enum nguoidung_TrangThai {
 enum nguoidung_LoaiGiayTo {
   CCCD
   Passport
+}
+
+enum chisodiennuoc_TrangThai {
+  ChoDuyetKeToan
+  DaDuyet
+  DaPhatHanhHoaDon
+  TuChoi
 }
