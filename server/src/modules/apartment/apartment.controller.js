@@ -1,40 +1,51 @@
 // server/src/modules/apartment/apartment.controller.js
 import * as apartmentService from "./apartment.service.js";
+import { apartmentIdParamSchema } from "./apartment.validation.js";
 
-export const getApartments = async (req, res) => {
+export const getApartments = async (req, res, next) => {
   try {
-    const filters = {
-      ToaNhaID: req.query.ToaNhaID,
-      TrangThai: req.query.TrangThai,
-      minGia: req.query.minGia,
-      maxGia: req.query.maxGia,
-      search: req.query.search,
-    };
-
-    const apartments = await apartmentService.getAllApartments(filters);
-    res.status(200).json({ success: true, data: apartments });
+    const apartments = await apartmentService.getAllApartments(req.query);
+    return res.status(200).json({ success: true, data: apartments });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return next(error);
   }
 };
 
-export const getApartmentDetail = async (req, res) => {
+export const getApartmentDetail = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { id } = apartmentIdParamSchema.parse(req.params);
     const apartment = await apartmentService.getApartmentById(id);
-    res.status(200).json({ success: true, data: apartment });
+    return res.status(200).json({ success: true, data: apartment });
   } catch (error) {
-    const status = error.statusCode || 500;
-    res.status(status).json({ success: false, message: error.message });
+    return next(error);
   }
 };
 
-export const createApartment = async (req, res) => {
+export const createApartment = async (req, res, next) => {
   try {
-    const result = await apartmentService.createApartment(req.body);
-    res.status(201).json({ success: true, data: result, message: "Tạo căn hộ thành công" });
+    const result = await apartmentService.createApartment(req.body, req.user.ID);
+    return res.status(201).json({ success: true, data: result, message: "Tạo căn hộ thành công" });
   } catch (error) {
-    const status = error.statusCode || 400;
-    res.status(status).json({ success: false, message: error.message });
+    return next(error);
+  }
+};
+
+export const updateApartment = async (req, res, next) => {
+  try {
+    const { id } = apartmentIdParamSchema.parse(req.params);
+    const result = await apartmentService.updateApartmentById(id, req.body, req.user);
+    return res.status(200).json({ success: true, data: result, message: "Cập nhật căn hộ thành công" });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const softDeleteApartment = async (req, res, next) => {
+  try {
+    const { id } = apartmentIdParamSchema.parse(req.params);
+    const result = await apartmentService.softDeleteApartmentById(id, req.user);
+    return res.status(200).json({ success: true, data: result, message: "Xóa mềm căn hộ thành công" });
+  } catch (error) {
+    return next(error);
   }
 };
