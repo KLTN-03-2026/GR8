@@ -44,7 +44,6 @@ setupSwagger(app);
 
 // Routes
 app.get("/", (req, res) => res.send("API is running..."));
-<<<<<<< HEAD
 app.get("/api/health", async (req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -60,35 +59,23 @@ app.get("/api/health", async (req, res) => {
     });
   }
 });
-=======
->>>>>>> 29771c022bada31c114306d1c0ee72cd1b05d898
 
 app.use("/api/auth", authRoutes);
 app.use("/api/apartments", apartmentRoutes);
 app.use("/api/users", userRoutes);
-<<<<<<< HEAD
-
-// Routes của cậu
-=======
->>>>>>> 29771c022bada31c114306d1c0ee72cd1b05d898
 app.use("/api/toanha", toanhaRoutes);
 app.use("/api/tienich", tienichRoutes);
 app.use("/api/taisan", taisanRoutes);
 app.use("/api/theguixe", theguixeRoutes);
-<<<<<<< HEAD
+app.use("/api/yeucauthue", yeuCauThueRoute);
+app.use("/api/hopdong", hopdongRoute);
+app.use("/api/chuyennhuong", chuyennhuongRoute);
 
 // Billing workflow routes
 app.use("/api/chisodiennuoc", chisoRoutes);
 app.use("/api/hoadon", hoadonRoutes);
 
 // Error handling (LUÔN đặt cuối)
-=======
-app.use("/api/yeucauthue", yeuCauThueRoute);
-app.use("/api/hopdong", hopdongRoute);
-app.use("/api/chuyennhuong", chuyennhuongRoute);
-
-// Middleware xử lý lỗi (LUÔN để cuối)
->>>>>>> 29771c022bada31c114306d1c0ee72cd1b05d898
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
