@@ -13,12 +13,16 @@ export const createChiSoDienNuocSchema = z.object({
     .regex(thangNamRegex, "ThangNam phải đúng định dạng MM-YYYY (VD: 04-2026)"),
   ChiSoDienMoi: z.coerce.number().nonnegative("Chỉ số điện mới phải >= 0"),
   ChiSoNuocMoi: z.coerce.number().nonnegative("Chỉ số nước mới phải >= 0"),
+  AnhDongHoDien: z.string().optional(),
+  AnhDongHoNuoc: z.string().optional(),
 });
 
 export const updateChiSoDienNuocSchema = z
   .object({
     ChiSoDienMoi: z.coerce.number().nonnegative("Chỉ số điện mới phải >= 0").optional(),
     ChiSoNuocMoi: z.coerce.number().nonnegative("Chỉ số nước mới phải >= 0").optional(),
+    AnhDongHoDien: z.string().optional(),
+    AnhDongHoNuoc: z.string().optional(),
   })
   .refine(
     (data) => data.ChiSoDienMoi !== undefined || data.ChiSoNuocMoi !== undefined,

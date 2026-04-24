@@ -1,70 +1,172 @@
-# Getting Started with Create React App
+# 🎨 Client - Apartment Management System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Giao diện quản lý chung cư đơn giản với React + Ant Design
 
-## Available Scripts
+## 🚀 Chạy ứng dụng
 
-In the project directory, you can run:
+### 1. Cài đặt dependencies
+```bash
+npm install
+```
 
-### `npm start`
+### 2. Chạy development server
+```bash
+npm start
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Ứng dụng sẽ chạy tại: `http://localhost:3000`
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📋 Chức năng
 
-### `npm test`
+### ✅ Đã hoàn thành:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. **Authentication**
+   - Đăng nhập
+   - Đăng ký
+   - Logout
+   - Protected routes
 
-### `npm run build`
+2. **Quản lý Căn hộ**
+   - Xem danh sách căn hộ
+   - Thêm căn hộ mới
+   - Sửa thông tin căn hộ
+   - Xóa căn hộ
+   - Filter theo trạng thái
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. **Quản lý Tài sản**
+   - Xem danh sách tài sản
+   - Thêm tài sản mới
+   - Sửa thông tin tài sản
+   - Xóa tài sản (soft delete)
+   - Thống kê tài sản
+   - Filter theo loại, tình trạng
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. **Quản lý Tiện ích**
+   - Xem danh sách tiện ích
+   - Thêm tiện ích mới
+   - Sửa tiện ích
+   - Xóa tiện ích
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🎯 Cách sử dụng
 
-### `npm run eject`
+### Đăng nhập
+1. Mở `http://localhost:3000/login`
+2. Nhập email/username và password
+3. Hoặc đăng ký tài khoản mới
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Test với tài khoản mẫu
+Nếu database đã có dữ liệu:
+```
+Email: admin@example.com
+Password: 123456
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Điều hướng
+- **Trang chủ**: `/` - Dashboard với thống kê tổng quan
+- **Căn hộ**: `/apartments` - Quản lý căn hộ
+- **Tài sản**: `/assets` - Quản lý tài sản
+- **Tiện ích**: `/amenities` - Quản lý tiện ích
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🛠️ Công nghệ sử dụng
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- **React 19** - UI Framework
+- **React Router v6** - Routing
+- **Ant Design** - UI Components
+- **Axios** - HTTP Client
+- **dayjs** - Date handling
 
-## Learn More
+## 📁 Cấu trúc thư mục
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+src/
+├── api/
+│   └── axios.js          # Axios config + interceptors
+├── components/
+│   └── Layout.jsx        # Layout chính với header, menu
+├── context/
+│   └── AuthContext.jsx   # Authentication context
+├── pages/
+│   ├── Home.jsx          # Trang chủ
+│   ├── Login.jsx         # Đăng nhập/Đăng ký
+│   ├── Apartments.jsx    # Quản lý căn hộ
+│   ├── Assets.jsx        # Quản lý tài sản
+│   └── Amenities.jsx     # Quản lý tiện ích
+└── App.jsx               # Main app với routes
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🔧 Cấu hình
 
-### Code Splitting
+### API Base URL
+File: `src/api/axios.js`
+```javascript
+baseURL: "http://localhost:5000/api"
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Token Storage
+- Token được lưu trong `localStorage`
+- Tự động thêm vào header của mỗi request
+- Tự động redirect về login khi token hết hạn (401)
 
-### Analyzing the Bundle Size
+## 🎨 Giao diện
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Đặc điểm:
+- ✅ Responsive design
+- ✅ Ant Design components
+- ✅ Vietnamese locale
+- ✅ Clean & simple UI
+- ✅ Loading states
+- ✅ Error handling
+- ✅ Success messages
 
-### Making a Progressive Web App
+### Màu sắc:
+- Primary: `#1890ff` (Blue)
+- Success: `#52c41a` (Green)
+- Error: `#ff4d4f` (Red)
+- Warning: `#faad14` (Orange)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 🐛 Troubleshooting
 
-### Advanced Configuration
+### Port 3000 đã được sử dụng
+```bash
+# Windows
+netstat -ano | findstr :3000
+taskkill /PID <process-id> /F
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+# Hoặc đổi port
+set PORT=3001 && npm start
+```
 
-### Deployment
+### Không kết nối được API
+1. Kiểm tra server đang chạy: `http://localhost:5000`
+2. Kiểm tra CORS đã enable
+3. Xem console browser có lỗi gì
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Token hết hạn
+- Đăng nhập lại để lấy token mới
+- Token có thời hạn 7 ngày
 
-### `npm run build` fails to minify
+## 📝 TODO
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [ ] Thêm pagination cho danh sách
+- [ ] Thêm search/filter nâng cao
+- [ ] Upload hình ảnh
+- [ ] Export Excel
+- [ ] Dark mode
+- [ ] Responsive mobile tốt hơn
+- [ ] Unit tests
+- [ ] E2E tests
+
+## 🚀 Build Production
+
+```bash
+npm run build
+```
+
+Output sẽ ở thư mục `build/`
+
+## 📚 Tài liệu tham khảo
+
+- [React Documentation](https://react.dev/)
+- [Ant Design](https://ant.design/)
+- [React Router](https://reactrouter.com/)
+- [Axios](https://axios-http.com/)

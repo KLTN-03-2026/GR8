@@ -73,3 +73,6 @@ export const authorize = (...allowedRoles) => {
     next();
   };
 };
+
+// Alias for backward compatibility
+export const authenticate = protect;

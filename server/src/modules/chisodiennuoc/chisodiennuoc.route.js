@@ -1,13 +1,7 @@
 import express from "express";
-import {
-  createChiSoDienNuoc,
-  getAllChiSoDienNuoc,
-  getChiSoDienNuocById,
-  updateChiSoDienNuoc,
-  deleteChiSoDienNuoc,
-} from "./chisodiennuoc.controller.js";
-import { protect } from "../../middlewares/auth.middleware.js";
-import { authorize } from "../../middlewares/role.middleware.js";
+import * as meterReadingController from "./chisodiennuoc.controller.js";
+import { authenticate, authorize } from "../auth/auth.middleware.js";
+import { ROLES } from "../../constants/roles.js";
 import {
   validate,
   createChiSoDienNuocSchema,
@@ -19,42 +13,49 @@ import {
 const router = express.Router();
 
 // ==================== MIDDLEWARE ====================
-router.use(protect);
-
-// ==================== ROLE ====================
-const ROLE = {
-  TECH: "NhanVienKyThuat",
-};
-
-const requireTechnician = authorize(ROLE.TECH);
+router.use(authenticate);
 
 // ==================== ROUTES ====================
 
 // READ
-router.get("/", validate(queryFilterSchema, "query"), getAllChiSoDienNuoc);
-router.get("/:id", validate(idParamSchema, "params"), getChiSoDienNuocById);
+router.get("/", validate(queryFilterSchema, "query"), meterReadingController.getAllMeterReadings);
+
+router.get(
+  "/pending",
+  authorize(ROLES.KE_TOAN, ROLES.QUAN_LY),
+  meterReadingController.getPendingMeterReadings
+);
+
+router.get("/:id", validate(idParamSchema, "params"), meterReadingController.getMeterReadingById);
 
 // WRITE
 router.post(
   "/",
-  requireTechnician,
+  authorize(ROLES.NHAN_VIEN_KY_THUAT, ROLES.QUAN_LY),
   validate(createChiSoDienNuocSchema, "body"),
-  createChiSoDienNuoc
+  meterReadingController.createMeterReading
 );
 
 router.put(
   "/:id",
-  requireTechnician,
+  authorize(ROLES.NHAN_VIEN_KY_THUAT, ROLES.QUAN_LY),
   validate(idParamSchema, "params"),
   validate(updateChiSoDienNuocSchema, "body"),
-  updateChiSoDienNuoc
+  meterReadingController.updateMeterReading
 );
 
 router.delete(
   "/:id",
-  requireTechnician,
+  authorize(ROLES.NHAN_VIEN_KY_THUAT, ROLES.QUAN_LY),
   validate(idParamSchema, "params"),
-  deleteChiSoDienNuoc
+  meterReadingController.deleteMeterReading
+);
+
+router.post(
+  "/:id/confirm",
+  authorize(ROLES.KE_TOAN, ROLES.QUAN_LY),
+  validate(idParamSchema, "params"),
+  meterReadingController.confirmAndGenerateInvoice
 );
 
 export default router;

@@ -1,69 +1,104 @@
-import * as chisodiennuocService from "./chisodiennuoc.service.js";
-import { returnResponse } from "../../utils/response.js";
+import * as meterReadingService from "./chisodiennuoc.service.js";
 
-export const createChiSoDienNuoc = async (req, res, next) => {
+export const createMeterReading = async (req, res, next) => {
   try {
-    const nguoiGhiId = req.user.id; // check lại field này
-    const data = req.body;
+    const technicianId = req.user.ID || req.user.id;
+    const reading = await meterReadingService.createMeterReading(req.body, technicianId);
 
-    const result = await chisodiennuocService.createChiSoDienNuoc(data, nguoiGhiId);
-
-    return returnResponse(res, result, "Tạo chỉ số điện nước thành công");
+    res.status(201).json({
+      success: true,
+      message: "Ghi chỉ số thành công, chờ kế toán duyệt",
+      data: reading,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export const getAllChiSoDienNuoc = async (req, res, next) => {
+export const getPendingMeterReadings = async (req, res, next) => {
   try {
-    const { page, limit, CanHoID, ThangNam } = req.query;
+    const result = await meterReadingService.getPendingMeterReadings(req.query);
 
-    const filters = {};
-    if (CanHoID) filters.CanHoID = CanHoID;
-    if (ThangNam) filters.ThangNam = ThangNam;
-
-    const pagination = { page, limit };
-
-    const result = await chisodiennuocService.getAllChiSoDienNuoc(filters, pagination);
-
-    return returnResponse(res, result, "Lấy danh sách chỉ số điện nước thành công");
+    res.json({
+      success: true,
+      data: result.items,
+      pagination: result.pagination,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export const getChiSoDienNuocById = async (req, res, next) => {
+export const getAllMeterReadings = async (req, res, next) => {
+  try {
+    const result = await meterReadingService.getAllMeterReadings(req.query);
+
+    res.json({
+      success: true,
+      data: result.items,
+      pagination: result.pagination,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMeterReadingById = async (req, res, next) => {
+  try {
+    const result = await meterReadingService.getMeterReadingById(req.params.id);
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateMeterReading = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
+    const result = await meterReadingService.updateMeterReading(id, req.body);
 
-    const result = await chisodiennuocService.getChiSoDienNuocById(id);
-
-    return returnResponse(res, result, "Lấy chi tiết chỉ số điện nước thành công");
+    res.json({
+      success: true,
+      message: "Cập nhật chỉ số điện nước thành công",
+      data: result,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export const updateChiSoDienNuoc = async (req, res, next) => {
+export const deleteMeterReading = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const data = req.body;
+    await meterReadingService.deleteMeterReading(id);
 
-    const result = await chisodiennuocService.updateChiSoDienNuoc(id, data);
-
-    return returnResponse(res, result, "Cập nhật chỉ số điện nước thành công");
+    res.json({
+      success: true,
+      message: "Xóa chỉ số điện nước thành công"
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export const deleteChiSoDienNuoc = async (req, res, next) => {
+export const confirmAndGenerateInvoice = async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const accountantId = req.user.ID || req.user.id;
+    const result = await meterReadingService.confirmAndGenerateInvoice(
+      req.params.id,
+      req.body,
+      accountantId
+    );
 
-    await chisodiennuocService.deleteChiSoDienNuoc(id);
-
-    return returnResponse(res, { success: true }, "Xóa chỉ số điện nước thành công");
+    res.json({
+      success: true,
+      message: "Xác nhận chỉ số và phát hành hóa đơn thành công",
+      data: result,
+    });
   } catch (error) {
     next(error);
   }
