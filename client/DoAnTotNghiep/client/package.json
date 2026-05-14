@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@vietmap/vietmap-gl-js": "^7.0.0-pre.1",
+    "@vietmap/vietmap-gl-react-native": "^2.3.2"
+  }
+}

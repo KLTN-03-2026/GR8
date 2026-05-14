@@ -1,0 +1,381 @@
+{
+  "info": {
+    "name": "Apartment Management API",
+    "description": "API Collection for Apartment Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TenDangNhap\": \"testuser\",\n  \"MatKhau\": \"123456\",\n  \"HoTen\": \"Test User\",\n  \"Email\": \"testuser@example.com\",\n  \"SoDienThoai\": \"0987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Đăng ký tài khoản mới"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set(\"auth_token\", jsonData.data.token);",
+                  "    console.log(\"✅ Token saved:\", jsonData.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TenDangNhapOrEmail\": \"admin@example.com\",\n  \"MatKhau\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Đăng nhập và lấy JWT token"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Apartments",
+      "item": [
+        {
+          "name": "Get All Apartments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/apartments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "apartments"]
+            },
+            "description": "Lấy danh sách tất cả căn hộ (Public API)"
+          }
+        },
+        {
+          "name": "Get Apartment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/apartments/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "apartments", "1"]
+            },
+            "description": "Lấy chi tiết căn hộ theo ID"
+          }
+        },
+        {
+          "name": "Create Apartment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"MaCanHo\": \"A101\",\n  \"Tang\": 1,\n  \"SoPhong\": \"3\",\n  \"DienTich\": 75.5,\n  \"GiaThue\": 5000000,\n  \"TienCoc\": 10000000,\n  \"TrangThai\": \"Trong\",\n  \"MoTa\": \"Căn hộ 3 phòng ngủ, view đẹp\",\n  \"ChuNhaID\": 1,\n  \"ToaNhaID\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/apartments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "apartments"]
+            },
+            "description": "Tạo căn hộ mới (Cần token)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tài sản",
+      "item": [
+        {
+          "name": "Get All Assets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/taisan",
+              "host": ["{{base_url}}"],
+              "path": ["api", "taisan"]
+            },
+            "description": "Lấy danh sách tài sản (Cần token)"
+          }
+        },
+        {
+          "name": "Get Assets by Filter",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/taisan?TinhTrang=Tot&LoaiTaiSan=ThietBiCanHo",
+              "host": ["{{base_url}}"],
+              "path": ["api", "taisan"],
+              "query": [
+                {
+                  "key": "TinhTrang",
+                  "value": "Tot"
+                },
+                {
+                  "key": "LoaiTaiSan",
+                  "value": "ThietBiCanHo"
+                }
+              ]
+            },
+            "description": "Lọc tài sản theo tình trạng và loại"
+          }
+        },
+        {
+          "name": "Get Asset by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/taisan/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "taisan", "1"]
+            },
+            "description": "Lấy chi tiết tài sản"
+          }
+        },
+        {
+          "name": "Create Asset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"MaTaiSan\": \"DH-A101-01\",\n  \"TenTaiSan\": \"Điều hòa Daikin 12000BTU\",\n  \"LoaiTaiSan\": \"ThietBiCanHo\",\n  \"CanHoID\": 1,\n  \"ViTri\": \"Phòng khách\",\n  \"TinhTrang\": \"Tot\",\n  \"NgayMua\": \"2024-04-19\",\n  \"GiaTri\": 15000000,\n  \"NhaCungCap\": \"Điện máy Xanh\",\n  \"SoLuong\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/taisan",
+              "host": ["{{base_url}}"],
+              "path": ["api", "taisan"]
+            },
+            "description": "Thêm tài sản mới"
+          }
+        },
+        {
+          "name": "Update Asset",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TinhTrang\": \"DangSua\",\n  \"GhiChu\": \"Điều hòa bị hỏng, đang sửa chữa\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/taisan/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "taisan", "1"]
+            },
+            "description": "Cập nhật thông tin tài sản"
+          }
+        },
+        {
+          "name": "Delete Asset",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/taisan/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "taisan", "1"]
+            },
+            "description": "Xóa tài sản (soft delete)"
+          }
+        },
+        {
+          "name": "Get Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/taisan/stats/thongke",
+              "host": ["{{base_url}}"],
+              "path": ["api", "taisan", "stats", "thongke"]
+            },
+            "description": "Thống kê tài sản (Chỉ QuanLy)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tiện ích",
+      "item": [
+        {
+          "name": "Get All Amenities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/tienich",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tienich"]
+            },
+            "description": "Lấy danh sách tiện ích (Public)"
+          }
+        },
+        {
+          "name": "Create Amenity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TenTienIch\": \"Điều hòa\",\n  \"MoTa\": \"Máy lạnh 2 chiều\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tienich",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tienich"]
+            },
+            "description": "Thêm tiện ích mới (Chỉ QuanLy)"
+          }
+        },
+        {
+          "name": "Assign Amenity to Apartment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"TienIchID\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tienich/canho/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tienich", "canho", "1"]
+            },
+            "description": "Gán tiện ích cho căn hộ"
+          }
+        },
+        {
+          "name": "Remove Amenity from Apartment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tienich/canho/1/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tienich", "canho", "1", "1"]
+            },
+            "description": "Gỡ tiện ích khỏi căn hộ"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}
