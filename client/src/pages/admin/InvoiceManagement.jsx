@@ -328,16 +328,6 @@ const InvoiceManagement = () => {
                                   className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold hover:bg-blue-200">
                                   Chi tiết
                                 </button>
-                                {inv.thanhtoan?.some(tt => tt.AnhMinhChung) && (
-                                  <button onClick={() => {
-                                    const img = inv.thanhtoan.find(tt => tt.AnhMinhChung)?.AnhMinhChung;
-                                    if (img) window.open(img, '_blank');
-                                  }}
-                                    className="px-3 py-1 bg-indigo-500 text-white rounded-lg text-xs font-semibold hover:bg-indigo-600"
-                                    title="Xem ảnh minh chứng">
-                                    Xem ảnh
-                                  </button>
-                                )}
                                 {['ChuaTT', 'ChoXacNhan'].includes(inv.TrangThai) && (
                                   <button onClick={() => handleConfirmPayment(inv.ID, inv.thanhtoan?.[0]?.PhuongThuc || 'TienMat')}
                                     className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-semibold hover:bg-green-200"
