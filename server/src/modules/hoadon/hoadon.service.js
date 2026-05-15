@@ -182,29 +182,50 @@ export const markAsPaid = async (invoiceId, tenantId, paymentData = {}) => {
     );
   }
 
-  // Update invoice status
+  // Update invoice status to Pending Confirmation
   const updatedInvoice = await prisma.$transaction(async (tx) => {
-    // Update invoice status to paid
     const updated = await tx.hoadon.update({
       where: { ID: Number(invoiceId) },
       data: {
-        TrangThai: "DaTT",
+        TrangThai: "ChoXacNhan",
       },
     });
 
-    // Create payment record
-    await tx.thanhtoan.create({
-      data: {
+    // Create or update payment record
+    // We check if there's already a pending payment record
+    const existingPayment = await tx.thanhtoan.findFirst({
+      where: { 
         HoaDonID: Number(invoiceId),
-        SoTien: updated.TongTien,
-        NgayThanhToan: new Date(),
-        PhuongThuc: paymentData.PhuongThuc || "ChuyenKhoan",
-        MaGiaoDich: paymentData.MaGiaoDich || null,
-        NganHang: paymentData.NganHang || updated.NganHangNhan,
-        AnhMinhChung: paymentData.AnhMinhChung || null,
-        GhiChu: paymentData.GhiChu || "Người thuê xác nhận đã chuyển khoản",
-      },
+        XacNhanBoID: null 
+      }
     });
+
+    if (existingPayment) {
+      await tx.thanhtoan.update({
+        where: { ID: existingPayment.ID },
+        data: {
+          SoTien: updated.TongTien,
+          NgayThanhToan: new Date(),
+          PhuongThuc: paymentData.PhuongThuc || "ChuyenKhoan",
+          MaGiaoDich: paymentData.MaGiaoDich || null,
+          AnhMinhChung: paymentData.AnhMinhChung || null,
+          GhiChu: paymentData.GhiChu || "Người thuê cập nhật thông tin thanh toán",
+        }
+      });
+    } else {
+      await tx.thanhtoan.create({
+        data: {
+          HoaDonID: Number(invoiceId),
+          SoTien: updated.TongTien,
+          NgayThanhToan: new Date(),
+          PhuongThuc: paymentData.PhuongThuc || "ChuyenKhoan",
+          MaGiaoDich: paymentData.MaGiaoDich || null,
+          NganHang: paymentData.NganHang || updated.NganHangNhan,
+          AnhMinhChung: paymentData.AnhMinhChung || null,
+          GhiChu: paymentData.GhiChu || "Người thuê xác nhận đã chuyển khoản",
+        },
+      });
+    }
 
     return updated;
   });
@@ -416,17 +437,35 @@ export const confirmPaymentByAccountant = async (invoiceId, accountantId, data =
       data: { TrangThai: "DaTT" },
     });
 
-    // 2. Tạo bản ghi thanh toán
-    await tx.thanhtoan.create({
-      data: {
+    // 2. Cập nhật hoặc Tạo bản ghi thanh toán
+    const existingPayment = await tx.thanhtoan.findFirst({
+      where: { 
         HoaDonID: Number(invoiceId),
-        SoTien: updated.TongTien,
-        NgayThanhToan: new Date(),
-        PhuongThuc: data.PhuongThuc || "TienMat",
-        XacNhanBoID: Number(accountantId),
-        GhiChu: data.GhiChu || `Kế toán xác nhận thanh toán (${data.PhuongThuc || "Tiền mặt"})`,
-      },
+        XacNhanBoID: null 
+      }
     });
+
+    if (existingPayment) {
+      await tx.thanhtoan.update({
+        where: { ID: existingPayment.ID },
+        data: {
+          XacNhanBoID: Number(accountantId),
+          PhuongThuc: data.PhuongThuc || existingPayment.PhuongThuc,
+          GhiChu: data.GhiChu || `${existingPayment.GhiChu} (Kế toán đã duyệt)`,
+        }
+      });
+    } else {
+      await tx.thanhtoan.create({
+        data: {
+          HoaDonID: Number(invoiceId),
+          SoTien: updated.TongTien,
+          NgayThanhToan: new Date(),
+          PhuongThuc: data.PhuongThuc || "TienMat",
+          XacNhanBoID: Number(accountantId),
+          GhiChu: data.GhiChu || `Kế toán xác nhận thanh toán (${data.PhuongThuc || "Tiền mặt"})`,
+        },
+      });
+    }
 
     return updated;
   });

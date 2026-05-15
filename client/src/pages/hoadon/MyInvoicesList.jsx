@@ -10,6 +10,7 @@ import {
 
 const STATUS_MAP = {
   ChuaTT: { label: 'Chưa thanh toán', variant: 'warning' },
+  ChoXacNhan: { label: 'Chờ xác nhận', variant: 'info' },
   DaTT:   { label: 'Đã thanh toán',   variant: 'success' },
   QuaHan: { label: 'Quá hạn',         variant: 'danger'  },
 };

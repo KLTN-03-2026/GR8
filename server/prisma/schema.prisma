@@ -702,6 +702,7 @@ enum yeucausuco_DoUuTien {
 
 enum hoadon_TrangThai {
   ChuaTT
+  ChoXacNhan
   DaTT
   QuaHan
 }

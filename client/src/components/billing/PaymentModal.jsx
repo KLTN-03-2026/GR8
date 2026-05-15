@@ -140,6 +140,7 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
 
   const qrUrl = getQRUrl();
   const isPaid = invoice.TrangThai === "DaTT";
+  const isPending = invoice.TrangThai === "ChoXacNhan";
 
   if (loadingDetail) {
     return createPortal(
@@ -166,7 +167,7 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
         >
           <div>
             <h2 className="text-2xl font-bold text-white mb-1">
-              {isPaid ? " Hóa Đơn Đã Thanh Toán" : " Thanh Toán Hóa Đơn"}
+              {isPaid ? " Hóa Đơn Đã Thanh Toán" : isPending ? " Đang Chờ Xác Nhận" : " Thanh Toán Hóa Đơn"}
             </h2>
             <p className="text-white text-opacity-90 text-sm">
               Mã hóa đơn: {invoice.MaHoaDon || invoice.ID}  Tháng{" "}
@@ -359,7 +360,7 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
           </div>
 
           {/* Payment Info */}
-          {!isPaid && qrUrl && (
+          {!isPaid && !isPending && qrUrl && (
             <div className="bg-white rounded-xl border-2 border-green-300 overflow-hidden">
               <div className="bg-green-600 px-6 py-3">
                 <h3 className="font-bold text-white flex items-center">
@@ -437,7 +438,7 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
           )}
 
           {/* Payment Confirmation Form */}
-          {!isPaid ? (
+          {!isPaid && !isPending ? (
             <form
               onSubmit={handlePayment}
               className="bg-gray-50 rounded-xl p-6 border border-gray-200"
@@ -606,9 +607,9 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
               </div>
             </form>
           ) : (
-            <div className="bg-green-50 border-2 border-green-300 rounded-xl p-6">
+            <div className={`border-2 rounded-xl p-6 ${isPaid ? "bg-green-50 border-green-300" : "bg-blue-50 border-blue-300"}`}>
               <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${isPaid ? "bg-green-500" : "bg-blue-500"}`}>
                   <svg
                     className="w-6 h-6 text-white"
                     fill="currentColor"
@@ -622,11 +623,11 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-bold text-green-900 text-lg">
-                    Hóa đơn đã được thanh toán
+                  <h3 className={`font-bold text-lg ${isPaid ? "text-green-900" : "text-blue-900"}`}>
+                    {isPaid ? "Hóa đơn đã được thanh toán" : "Hóa đơn đang chờ xác nhận"}
                   </h3>
-                  <p className="text-green-700 text-sm">
-                    Ngày thanh toán:{" "}
+                  <p className={`${isPaid ? "text-green-700" : "text-blue-700"} text-sm`}>
+                    Ngày {isPaid ? "thanh toán" : "báo cáo"}:{" "}
                     {invoice.thanhtoan?.[0] &&
                       new Date(
                         invoice.thanhtoan[0].NgayThanhToan,

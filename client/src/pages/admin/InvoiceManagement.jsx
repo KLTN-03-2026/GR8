@@ -8,6 +8,7 @@ import MonthYearPicker from '../../components/common/MonthYearPicker';
 
 const STATUS_CONFIG = {
   ChuaTT: { label: 'Chưa TT',  color: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
+  ChoXacNhan: { label: 'Chờ XN', color: 'bg-blue-100 text-blue-800 border-blue-300' },
   DaTT:   { label: 'Đã TT',    color: 'bg-green-100 text-green-800 border-green-300' },
   QuaHan: { label: 'Quá hạn',  color: 'bg-red-100 text-red-800 border-red-300' },
 };
@@ -152,7 +153,7 @@ const InvoiceManagement = () => {
   };
 
   const handleConfirmPayment = async (id, phuongThuc = 'TienMat') => {
-    const label = phuongThuc === 'TienMat' ? 'tiền mặt' : 'thanh toán';
+    const label = phuongThuc === 'TienMat' ? 'tiền mặt' : 'chuyển khoản';
     if (!window.confirm(`Xác nhận đã nhận ${label} cho hóa đơn này?`)) return;
     try {
       await axios.post(`/hoadon/${id}/confirm-payment`, { PhuongThuc: phuongThuc });
@@ -323,11 +324,11 @@ const InvoiceManagement = () => {
                                   className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold hover:bg-blue-200">
                                   Chi tiết
                                 </button>
-                                {inv.TrangThai === 'ChuaTT' && (
-                                  <button onClick={() => handleConfirmPayment(inv.ID, 'TienMat')}
+                                {['ChuaTT', 'ChoXacNhan'].includes(inv.TrangThai) && (
+                                  <button onClick={() => handleConfirmPayment(inv.ID, inv.thanhtoan?.[0]?.PhuongThuc || 'TienMat')}
                                     className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-semibold hover:bg-green-200"
-                                    title="Xác nhận đã nộp bằng tiền mặt">
-                                    Xác nhận tiền mặt
+                                    title="Xác nhận thanh toán">
+                                    Xác nhận
                                   </button>
                                 )}
                               </div>
@@ -599,10 +600,10 @@ const InvoiceManagement = () => {
               <div className="flex gap-3">
                 <button onClick={() => setShowDetail(false)}
                   className="flex-1 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-semibold">Đóng</button>
-                {selectedInvoice.TrangThai === 'ChuaTT' && (
-                  <button onClick={() => handleConfirmPayment(selectedInvoice.ID, 'TienMat')}
+                {['ChuaTT', 'ChoXacNhan'].includes(selectedInvoice.TrangThai) && (
+                  <button onClick={() => handleConfirmPayment(selectedInvoice.ID, selectedInvoice.thanhtoan?.[0]?.PhuongThuc || 'TienMat')}
                     className="flex-1 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow-md">
-                     Xác Nhận Tiền Mặt
+                     Xác Nhận Thanh Toán
                   </button>
                 )}
               </div>
