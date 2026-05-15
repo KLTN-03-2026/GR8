@@ -317,13 +317,27 @@ const InvoiceManagement = () => {
                             <td className={`px-4 py-3 text-sm ${isOverdue ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>
                               {new Date(inv.NgayDenHan).toLocaleDateString('vi-VN')}
                             </td>
-                            <td className="px-4 py-3">{getStatusBadge(inv.TrangThai, inv.NgayDenHan)}</td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                {getStatusBadge(inv.TrangThai, inv.NgayDenHan)}
+                              </div>
+                            </td>
                             <td className="px-4 py-3">
                               <div className="flex gap-2">
                                 <button onClick={() => openDetail(inv.ID)}
                                   className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold hover:bg-blue-200">
                                   Chi tiết
                                 </button>
+                                {inv.thanhtoan?.some(tt => tt.AnhMinhChung) && (
+                                  <button onClick={() => {
+                                    const img = inv.thanhtoan.find(tt => tt.AnhMinhChung)?.AnhMinhChung;
+                                    if (img) window.open(img, '_blank');
+                                  }}
+                                    className="px-3 py-1 bg-indigo-500 text-white rounded-lg text-xs font-semibold hover:bg-indigo-600"
+                                    title="Xem ảnh minh chứng">
+                                    Xem ảnh
+                                  </button>
+                                )}
                                 {['ChuaTT', 'ChoXacNhan'].includes(inv.TrangThai) && (
                                   <button onClick={() => handleConfirmPayment(inv.ID, inv.thanhtoan?.[0]?.PhuongThuc || 'TienMat')}
                                     className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-semibold hover:bg-green-200"
@@ -581,14 +595,24 @@ const InvoiceManagement = () => {
                         {tt.MaGiaoDich && <span>Mã GD: {tt.MaGiaoDich}</span>}
                       </div>
                       {tt.AnhMinhChung && (
-                        <div className="mt-2">
-                          <p className="text-[10px] text-gray-500 mb-1">Minh chứng chuyển khoản:</p>
-                          <img 
-                            src={tt.AnhMinhChung} 
-                            alt="Minh chứng" 
-                            className="w-24 h-24 object-cover rounded border border-gray-200 cursor-zoom-in hover:opacity-80"
-                            onClick={() => window.open(tt.AnhMinhChung, '_blank')}
-                          />
+                        <div className="mt-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                          <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                            <svg className="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Ảnh minh chứng thanh toán:
+                          </p>
+                          <div className="relative group">
+                            <img 
+                              src={tt.AnhMinhChung} 
+                              alt="Minh chứng" 
+                              className="w-full max-h-64 object-contain rounded border border-gray-300 cursor-zoom-in transition-transform hover:scale-[1.02]"
+                              onClick={() => window.open(tt.AnhMinhChung, '_blank')}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 pointer-events-none rounded">
+                              <span className="bg-white/90 px-2 py-1 rounded text-[10px] font-bold text-gray-700">Click để phóng to</span>
+                            </div>
+                          </div>
                         </div>
                       )}
                       {tt.GhiChu && <div className="text-xs italic text-gray-400 mt-1">{tt.GhiChu}</div>}

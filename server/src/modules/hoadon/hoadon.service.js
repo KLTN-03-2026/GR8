@@ -201,16 +201,21 @@ export const markAsPaid = async (invoiceId, tenantId, paymentData = {}) => {
     });
 
     if (existingPayment) {
+      const updateData = {
+        SoTien: updated.TongTien,
+        NgayThanhToan: new Date(),
+        PhuongThuc: paymentData.PhuongThuc || existingPayment.PhuongThuc,
+        MaGiaoDich: paymentData.MaGiaoDich || existingPayment.MaGiaoDich,
+        GhiChu: paymentData.GhiChu || "Người thuê cập nhật thông tin thanh toán",
+      };
+      
+      if (paymentData.AnhMinhChung) {
+        updateData.AnhMinhChung = paymentData.AnhMinhChung;
+      }
+
       await tx.thanhtoan.update({
         where: { ID: existingPayment.ID },
-        data: {
-          SoTien: updated.TongTien,
-          NgayThanhToan: new Date(),
-          PhuongThuc: paymentData.PhuongThuc || "ChuyenKhoan",
-          MaGiaoDich: paymentData.MaGiaoDich || null,
-          AnhMinhChung: paymentData.AnhMinhChung || null,
-          GhiChu: paymentData.GhiChu || "Người thuê cập nhật thông tin thanh toán",
-        }
+        data: updateData
       });
     } else {
       await tx.thanhtoan.create({
