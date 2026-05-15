@@ -460,47 +460,9 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
                   >
                     <option value="ChuyenKhoan">Chuyển khoản</option>
                     <option value="TienMat">Tiền mặt</option>
-                    <option value="VNPay">VNPay</option>
-                    <option value="Momo">Momo</option>
-                    <option value="ZaloPay">ZaloPay</option>
                   </select>
                 </div>
 
-                {paymentData.PhuongThuc === "VNPay" && (
-                  <div className="space-y-3 bg-blue-50 rounded-xl p-4 border border-blue-200">
-                    <button
-                      type="button"
-                      onClick={handleVNPayCheckout}
-                      disabled={checkoutLoading}
-                      className={`w-full py-3 rounded-xl text-white font-bold text-lg transition-all duration-200 ${
-                        checkoutLoading
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600"
-                      }`}
-                    >
-                      {checkoutLoading ? "Đang tạo VNPay..." : "Mở cổng VNPay"}
-                    </button>
-                    <p className="text-sm text-gray-600">
-                      Nhấn nút trên để mở cổng VNPay. Sau khi thanh toán xong,
-                      bạn sẽ được chuyển hướng đến trang trạng thái thanh toán
-                      để xem chi tiết kết quả. Nếu không được chuyển hướng tự
-                      động, bạn có thể quay lại trang hóa đơn.
-                    </p>
-                    {checkoutError && (
-                      <p className="text-sm text-red-600">{checkoutError}</p>
-                    )}
-                    {checkoutUrl && (
-                      <a
-                        href={checkoutUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        Mở lại link VNPay
-                      </a>
-                    )}
-                  </div>
-                )}
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -516,36 +478,39 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Hình ảnh minh chứng (chuyển khoản)
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="w-full px-4 py-2 text-sm border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400"
-                      />
-                      <p className="text-[10px] text-gray-500 mt-1">Chấp nhận JPG, PNG, WebP (tối đa 5MB)</p>
-                    </div>
-                    {previewUrl && (
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200">
-                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-                        <button 
-                          type="button" 
-                          onClick={() => { setEvidenceFile(null); setPreviewUrl(null); }}
-                          className="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl-md"
-                        >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M6 18L18 6M6 6l12 12" strokeWidth={3} />
-                          </svg>
-                        </button>
+                {paymentData.PhuongThuc === "ChuyenKhoan" && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Hình ảnh minh chứng (chuyển khoản)
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          required
+                          className="w-full px-4 py-2 text-sm border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 bg-white"
+                        />
+                        <p className="text-[10px] text-gray-500 mt-1">Chấp nhận JPG, PNG, WebP (tối đa 5MB)</p>
                       </div>
-                    )}
+                      {previewUrl && (
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200">
+                          <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                          <button 
+                            type="button" 
+                            onClick={() => { setEvidenceFile(null); setPreviewUrl(null); }}
+                            className="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl-md"
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path d="M6 18L18 6M6 6l12 12" strokeWidth={3} />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
