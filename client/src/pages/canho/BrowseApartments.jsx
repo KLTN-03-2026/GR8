@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from '../../api/axios';
 import { formatCurrency } from '../../utils/formatCurrency';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { normalizeAnhCanHoEntries, resolveMediaUrl, getFeaturedImageUrl } from '../../utils/mediaUrl';
 import {
   PageWrapper, PageHeader, Alert, Card, Btn,
@@ -12,6 +12,7 @@ import ApartmentFilter from '../../components/canho/ApartmentFilter';
 
 const BrowseApartments = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [apartments, setApartments]       = useState([]);
   const [loading, setLoading]             = useState(true);
   const [error, setError]                 = useState('');
@@ -41,7 +42,12 @@ const BrowseApartments = () => {
       }
     };
     fetchBuildings();
-  }, []);
+
+    // Check for initial search from Home page
+    if (location.state?.initialSearch) {
+      setFilter(prev => ({ ...prev, search: location.state.initialSearch }));
+    }
+  }, [location.state]);
 
   useEffect(() => { fetchApartments(); }, [filter]);
 

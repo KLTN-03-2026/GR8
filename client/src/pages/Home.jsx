@@ -328,6 +328,7 @@ const Home = () => {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Nhập tên căn hộ, số phòng..."
+              onKeyDown={e => e.key === 'Enter' && navigate('/browse-apartments', { state: { initialSearch: search } })}
               style={{ 
                 flex: 1, 
                 border: 'none', 
@@ -340,17 +341,19 @@ const Home = () => {
                 fontWeight: 500,
               }}
             />
-            <button style={{
-              background: 'linear-gradient(135deg, #A8E6CF 0%, #4CAF7A 100%)', 
-              color: '#fff', 
-              border: 'none',
-              borderRadius: 8, 
-              padding: '12px 28px', 
-              fontWeight: 700, 
-              fontSize: 15, 
-              cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(168, 230, 207, 0.4)',
-            }}>
+            <button 
+              onClick={() => navigate('/browse-apartments', { state: { initialSearch: search } })}
+              style={{
+                background: 'linear-gradient(135deg, #A8E6CF 0%, #4CAF7A 100%)', 
+                color: '#fff', 
+                border: 'none',
+                borderRadius: 8, 
+                padding: '12px 28px', 
+                fontWeight: 700, 
+                fontSize: 15, 
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(168, 230, 207, 0.4)',
+              }}>
               Tìm kiếm
             </button>
           </div>
