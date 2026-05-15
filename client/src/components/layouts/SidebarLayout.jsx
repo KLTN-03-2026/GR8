@@ -76,7 +76,6 @@ const MENU_CONFIG = {
     {
       group: "Tài chính",
       items: [
-        { key: "/hoadon-all",       label: "Hóa đơn" },
         { key: "/reports",          label: "Báo cáo" },
       ],
     },

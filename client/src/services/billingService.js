@@ -57,7 +57,10 @@ export const getInvoiceDetail = async (id) => {
 export const getInvoiceById = getInvoiceDetail;
 
 export const markInvoiceAsPaid = async (id, data = {}) => {
-  const response = await api.post(`/hoadon/${id}/mark-paid`, data);
+  const config = data instanceof FormData ? {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  } : {};
+  const response = await api.post(`/hoadon/${id}/mark-paid`, data, config);
   return response.data;
 };
 

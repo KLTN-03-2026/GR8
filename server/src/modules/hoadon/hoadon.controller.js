@@ -67,10 +67,15 @@ export const getInvoiceById = async (req, res, next) => {
 export const markAsPaid = async (req, res, next) => {
   try {
     const tenantId = req.user.ID;
+    const paymentData = {
+      ...req.body,
+      AnhMinhChung: req.file ? req.file.path : null,
+    };
+    
     const invoice = await invoiceService.markAsPaid(
       req.params.id,
       tenantId,
-      req.body
+      paymentData
     );
 
     res.json({
@@ -120,32 +125,21 @@ export const getOverdueGrouped = async (req, res, next) => {
  */
 export const confirmPayment = async (req, res, next) => {
   try {
-    const invoice = await invoiceService.getInvoiceById(req.params.id);
-    if (!invoice) {
-      return res.status(404).json({ success: false, message: 'Không tìm thấy hóa đơn' });
-    }
-    if (invoice.TrangThai === 'DaTT') {
-      return res.status(400).json({ success: false, message: 'Hóa đơn đã được thanh toán' });
-    }
+    const accountantId = req.user.ID;
+    const invoiceId = req.params.id;
+    const { PhuongThuc, GhiChu } = req.body;
 
-    const { default: prisma } = await import('../../config/prisma.js');
-    await prisma.$transaction(async (tx) => {
-      await tx.hoadon.update({
-        where: { ID: Number(req.params.id) },
-        data: { TrangThai: 'DaTT' },
-      });
-      await tx.thanhtoan.create({
-        data: {
-          HoaDonID: Number(req.params.id),
-          SoTien: invoice.TongTien,
-          NgayThanhToan: new Date(),
-          PhuongThuc: req.body.PhuongThuc || 'TienMat',
-          GhiChu: req.body.GhiChu || 'Kế toán xác nhận đã nhận thanh toán',
-        },
-      });
+    const result = await invoiceService.confirmPaymentByAccountant(
+      invoiceId, 
+      accountantId, 
+      { PhuongThuc, GhiChu }
+    );
+
+    res.json({ 
+      success: true, 
+      message: 'Đã xác nhận thanh toán thành công',
+      data: result 
     });
-
-    res.json({ success: true, message: 'Đã xác nhận thanh toán' });
   } catch (error) {
     next(error);
   }

@@ -44,7 +44,7 @@ const Layout = ({ children }) => {
         allItems.apartments, allItems.amenities, allItems.assets,
         allItems.services,
         allItems.rentalRequests, allItems.contracts,
-        allItems.meterReading, allItems.invoiceAll,
+        allItems.meterReading,
         allItems.users, allItems.transferRequests,
       ],
       KeToan: [

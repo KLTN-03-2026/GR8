@@ -24,6 +24,8 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
     MaGiaoDich: "",
     GhiChu: "",
   });
+  const [evidenceFile, setEvidenceFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
     if (initialInvoice?.ID) {
@@ -49,6 +51,18 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEvidenceFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleVNPayCheckout = async () => {
@@ -87,7 +101,15 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
     setSuccess("");
 
     try {
-      await markInvoiceAsPaid(invoice.ID, paymentData);
+      const formData = new FormData();
+      formData.append("PhuongThuc", paymentData.PhuongThuc);
+      formData.append("MaGiaoDich", paymentData.MaGiaoDich);
+      formData.append("GhiChu", paymentData.GhiChu);
+      if (evidenceFile) {
+        formData.append("minhChung", evidenceFile);
+      }
+
+      await markInvoiceAsPaid(invoice.ID, formData);
       setSuccess(" Đã xác nhận thanh toán! Chờ kế toán kiểm tra.");
 
       // Auto close after 2 seconds
@@ -495,6 +517,37 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Hình ảnh minh chứng (chuyển khoản)
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="w-full px-4 py-2 text-sm border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400"
+                      />
+                      <p className="text-[10px] text-gray-500 mt-1">Chấp nhận JPG, PNG, WebP (tối đa 5MB)</p>
+                    </div>
+                    {previewUrl && (
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200">
+                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <button 
+                          type="button" 
+                          onClick={() => { setEvidenceFile(null); setPreviewUrl(null); }}
+                          className="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl-md"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 18L18 6M6 6l12 12" strokeWidth={3} />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Ghi chú
                   </label>
                   <textarea
@@ -603,6 +656,19 @@ const PaymentModal = ({ invoice: initialInvoice, onClose }) => {
                       <p className="text-gray-900 mt-1">
                         {invoice.thanhtoan[0].GhiChu}
                       </p>
+                    </div>
+                  )}
+                  {invoice.thanhtoan[0].AnhMinhChung && (
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <span className="text-gray-600 block mb-2">Minh chứng thanh toán:</span>
+                      <div className="rounded-xl overflow-hidden border border-gray-200 bg-gray-50 inline-block">
+                        <img 
+                          src={invoice.thanhtoan[0].AnhMinhChung} 
+                          alt="Minh chứng" 
+                          className="max-w-full md:max-w-md h-auto cursor-zoom-in"
+                          onClick={() => window.open(invoice.thanhtoan[0].AnhMinhChung, '_blank')}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>

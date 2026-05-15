@@ -201,6 +201,7 @@ export const markAsPaid = async (invoiceId, tenantId, paymentData = {}) => {
         PhuongThuc: paymentData.PhuongThuc || "ChuyenKhoan",
         MaGiaoDich: paymentData.MaGiaoDich || null,
         NganHang: paymentData.NganHang || updated.NganHangNhan,
+        AnhMinhChung: paymentData.AnhMinhChung || null,
         GhiChu: paymentData.GhiChu || "Người thuê xác nhận đã chuyển khoản",
       },
     });
@@ -390,4 +391,43 @@ export const generateVietQRUrl = (invoice) => {
   // Build the VietQR image URL
   const qrUrl = `${config.VIETQR_API}/${bankCode}-${accountNumber}-compact.png?amount=${amount}&addInfo=${encodeURIComponent(content)}`;
   return qrUrl;
+};
+
+/**
+ * Accountant confirms payment (manual)
+ */
+export const confirmPaymentByAccountant = async (invoiceId, accountantId, data = {}) => {
+  const invoice = await prisma.hoadon.findUnique({
+    where: { ID: Number(invoiceId) },
+  });
+
+  if (!invoice) {
+    throw Object.assign(new Error("Không tìm thấy hóa đơn"), { statusCode: 404 });
+  }
+
+  if (invoice.TrangThai === "DaTT") {
+    throw Object.assign(new Error("Hóa đơn đã được thanh toán"), { statusCode: 400 });
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    // 1. Cập nhật trạng thái hóa đơn
+    const updated = await tx.hoadon.update({
+      where: { ID: Number(invoiceId) },
+      data: { TrangThai: "DaTT" },
+    });
+
+    // 2. Tạo bản ghi thanh toán
+    await tx.thanhtoan.create({
+      data: {
+        HoaDonID: Number(invoiceId),
+        SoTien: updated.TongTien,
+        NgayThanhToan: new Date(),
+        PhuongThuc: data.PhuongThuc || "TienMat",
+        XacNhanBoID: Number(accountantId),
+        GhiChu: data.GhiChu || `Kế toán xác nhận thanh toán (${data.PhuongThuc || "Tiền mặt"})`,
+      },
+    });
+
+    return updated;
+  });
 };

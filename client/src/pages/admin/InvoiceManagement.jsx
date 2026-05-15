@@ -151,10 +151,11 @@ const InvoiceManagement = () => {
     }
   };
 
-  const handleConfirmPayment = async (id) => {
-    if (!window.confirm('Xác nhận đã nhận thanh toán cho hóa đơn này?')) return;
+  const handleConfirmPayment = async (id, phuongThuc = 'TienMat') => {
+    const label = phuongThuc === 'TienMat' ? 'tiền mặt' : 'thanh toán';
+    if (!window.confirm(`Xác nhận đã nhận ${label} cho hóa đơn này?`)) return;
     try {
-      await axios.post(`/hoadon/${id}/confirm-payment`);
+      await axios.post(`/hoadon/${id}/confirm-payment`, { PhuongThuc: phuongThuc });
       setSuccess('Đã xác nhận thanh toán!');
       fetchInvoices();
       if (activeTab === 'debt') fetchDebtList();
@@ -323,9 +324,10 @@ const InvoiceManagement = () => {
                                   Chi tiết
                                 </button>
                                 {inv.TrangThai === 'ChuaTT' && (
-                                  <button onClick={() => handleConfirmPayment(inv.ID)}
-                                    className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-semibold hover:bg-green-200">
-                                    Xác nhận TT
+                                  <button onClick={() => handleConfirmPayment(inv.ID, 'TienMat')}
+                                    className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-semibold hover:bg-green-200"
+                                    title="Xác nhận đã nộp bằng tiền mặt">
+                                    Xác nhận tiền mặt
                                   </button>
                                 )}
                               </div>
@@ -566,11 +568,29 @@ const InvoiceManagement = () => {
 
               {selectedInvoice.thanhtoan?.length > 0 && (
                 <div className="bg-green-50 p-4 rounded-xl text-sm">
-                  <h4 className="font-bold text-gray-900 mb-2">Lịch Sử Thanh Toán</h4>
+                  <h4 className="font-bold text-gray-900 mb-3 border-b border-green-200 pb-1">Lịch Sử Thanh Toán</h4>
                   {selectedInvoice.thanhtoan.map((tt, i) => (
-                    <div key={i} className="flex justify-between">
-                      <span className="text-gray-600">{new Date(tt.NgayThanhToan).toLocaleDateString('vi-VN')}</span>
-                      <span className="font-semibold text-green-700">{formatCurrency(tt.SoTien)}</span>
+                    <div key={i} className="mb-3 last:mb-0">
+                      <div className="flex justify-between font-medium">
+                        <span className="text-gray-600">{new Date(tt.NgayThanhToan).toLocaleDateString('vi-VN')}</span>
+                        <span className="text-green-700">{formatCurrency(tt.SoTien)}</span>
+                      </div>
+                      <div className="flex justify-between text-xs mt-1 text-gray-500">
+                        <span>Phương thức: <span className="text-blue-600 font-semibold">{tt.PhuongThuc}</span></span>
+                        {tt.MaGiaoDich && <span>Mã GD: {tt.MaGiaoDich}</span>}
+                      </div>
+                      {tt.AnhMinhChung && (
+                        <div className="mt-2">
+                          <p className="text-[10px] text-gray-500 mb-1">Minh chứng chuyển khoản:</p>
+                          <img 
+                            src={tt.AnhMinhChung} 
+                            alt="Minh chứng" 
+                            className="w-24 h-24 object-cover rounded border border-gray-200 cursor-zoom-in hover:opacity-80"
+                            onClick={() => window.open(tt.AnhMinhChung, '_blank')}
+                          />
+                        </div>
+                      )}
+                      {tt.GhiChu && <div className="text-xs italic text-gray-400 mt-1">{tt.GhiChu}</div>}
                     </div>
                   ))}
                 </div>
@@ -580,9 +600,9 @@ const InvoiceManagement = () => {
                 <button onClick={() => setShowDetail(false)}
                   className="flex-1 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-semibold">Đóng</button>
                 {selectedInvoice.TrangThai === 'ChuaTT' && (
-                  <button onClick={() => handleConfirmPayment(selectedInvoice.ID)}
-                    className="flex-1 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold">
-                     Xác Nhận Đã TT
+                  <button onClick={() => handleConfirmPayment(selectedInvoice.ID, 'TienMat')}
+                    className="flex-1 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow-md">
+                     Xác Nhận Tiền Mặt
                   </button>
                 )}
               </div>

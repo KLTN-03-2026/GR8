@@ -5,6 +5,7 @@ import express from "express";
 import * as invoiceController from "./hoadon.controller.js";
 import { authenticate, authorize } from "../auth/auth.middleware.js";
 import { ROLES } from "../../constants/roles.js";
+import { uploadThanhToanPhoto } from "../../middleware/cloudinary-upload.middleware.js";
 
 const router = express.Router();
 
@@ -60,6 +61,7 @@ router.post(
   "/:id/mark-paid",
   authenticate,
   authorize(ROLES.NGUOI_THUE, ROLES.KHACH_VANG_LAI),
+  uploadThanhToanPhoto.single("minhChung"),
   invoiceController.markAsPaid
 );
 

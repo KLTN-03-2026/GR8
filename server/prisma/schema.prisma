@@ -393,6 +393,7 @@ model thanhtoan {
   NganHang      String?              @db.VarChar(50)
   XacNhanBoID   Int?
   GhiChu        String?              @db.Text
+  AnhMinhChung  String?              @db.VarChar(500)
   hoadon        hoadon               @relation(fields: [HoaDonID], references: [ID], onDelete: NoAction)
   nguoidung     nguoidung?           @relation(fields: [XacNhanBoID], references: [ID], onDelete: NoAction)
 

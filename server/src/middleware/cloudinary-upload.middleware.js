@@ -109,3 +109,19 @@ export const uploadCCCD = multer({
   fileFilter: imageFileFilter,
   limits: { fileSize: 5 * 1024 * 1024 },
 });
+
+// ==================== THANH TOAN (PAYMENT) UPLOAD ====================
+export const THANHTOAN_UPLOAD_SUBDIR = "thanhtoan";
+const thanhtoanStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: `apartment_management/${THANHTOAN_UPLOAD_SUBDIR}`,
+    allowed_formats: ["jpg", "jpeg", "png", "gif", "webp"],
+  },
+});
+
+export const uploadThanhToanPhoto = multer({
+  storage: thanhtoanStorage,
+  fileFilter: imageFileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});

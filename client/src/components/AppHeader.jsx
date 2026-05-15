@@ -16,7 +16,6 @@ export const ROLE_MENUS = {
     { label: "Quản lý sự cố", path: "/assign-incidents" },
     // { label: "Lịch trực", path: "/duty-schedule" }, // Đã tắt để giảm test case
     { label: "Ghi chỉ số", path: "/meter-reading" },
-    { label: "Hóa đơn", path: "/hoadon-all" },
     { label: "Người dùng", path: "/users" },
     { label: "Hồ sơ", path: "/profile" },
   ],
