@@ -1,125 +1,104 @@
-# 🏢 Hệ Thống Quản Lý Chung Cư — SmartBuilding
+# GR8 - Hệ thống quản lý chung cư
 
-Đồ án tốt nghiệp — Hệ thống quản lý chung cư toàn diện với Chatbot AI.
-
----
-
-## ⚙️ Yêu Cầu Cài Đặt Trước
-
-- [Node.js v18+](https://nodejs.org/)
-- [MySQL 8+](https://dev.mysql.com/downloads/)
-- Gitm
+Đồ án tốt nghiệp về hệ thống quản lý chung cư với frontend React, backend Node.js/Express và database MySQL.
 
 ---
 
-## 🚀 Hướng Dẫn Chạy Local (Lần Đầu)
+## Yêu cầu
 
-### Bước 1 — Clone project
-
-```bash
-git clone https://github.com/ChungChien04/DoAnTotNghiep.git
-cd DoAnTotNghiep
-```
-
-### Bước 2 — Cài đặt dependencies
-
-```bash
-# Backend
-cd server
-npm install
-
-# Frontend (mở terminal mới)
-cd client
-npm install
-```
-
-### Bước 3 — Cấu hình Backend
-
-File `server/.env` đã có sẵn, **không cần chỉnh sửa gì** khi chạy local với database Railway.
-
-> Database đang dùng MySQL trên Railway (cloud), không cần cài MySQL local.
-
-### Bước 4 — Chạy ứng dụng
-
-Mở **2 terminal** chạy song song:
-
-**Terminal 1 — Backend:**
-```bash
-cd server
-npm run dev
-```
-> Backend chạy tại: http://localhost:5000
-
-**Terminal 2 — Frontend:**
-```bash
-cd client
-npm start
-```
-> Frontend tự mở tại: http://localhost:3000
+- Node.js v18+
+- MySQL 8+
+- Git
 
 ---
 
-## 🎯 Tài Khoản Test
+## Cài đặt
 
-Mật khẩu tất cả tài khoản: **`123456`**
+1. Clone project:
+   ```bash
+   git clone https://github.com/KLTN-03-2026/GR8.git
+   cd DoAnTotNghiep
+   ```
+2. Cài dependencies:
+   - Backend:
+     ```bash
+     cd server
+     npm install
+     ```
+   - Frontend:
+     ```bash
+     cd client
+     npm install
+     ```
+3. Cấu hình backend:
+   - File `server/.env` đã có sẵn.
+   - Nếu cần thay đổi cổng, chỉnh `PORT` trong `server/.env`.
+
+---
+
+## Chạy ứng dụng
+
+Mở hai terminal:
+
+- Backend:
+  ```bash
+  cd server
+  npm run dev
+  ```
+  Backend mặc định ở `http://localhost:5000`
+
+- Frontend:
+  ```bash
+  cd client
+  npm start
+  ```
+  Frontend mặc định ở `http://localhost:3000`
+
+---
+
+## Tài khoản test
+
+Mật khẩu chung: `123456`
 
 | Vai trò | Email | Chức năng |
 |---------|-------|-----------|
-| 👨‍💼 Quản lý | quanly@gmail.com | Quản lý toàn bộ hệ thống |
-| 💰 Kế toán | ketoan@gmail.com | Quản lý tài chính, hóa đơn |
-| 🔧 Kỹ thuật | staff1@gmail.com | Ghi chỉ số, xử lý sự cố |
-| 🏠 Chủ nhà | owner1@gmail.com | Quản lý căn hộ của mình |
-| 👤 Người thuê | tenant1@gmail.com | Xem hóa đơn, báo sự cố |
+| Quản lý | quanly@gmail.com | Quản lý hệ thống |
+| Kế toán | ketoan@gmail.com | Quản lý hóa đơn |
+| Kỹ thuật | staff1@gmail.com | Ghi chỉ số và xử lý sự cố |
+| Chủ nhà | owner1@gmail.com | Quản lý căn hộ |
+| Người thuê | tenant1@gmail.com | Xem hóa đơn và báo sự cố |
 
 ---
 
-## 🌐 Demo Online (Vercel)
-
-> https://do-an-tot-nghiep-tan.vercel.app
-
----
-
-## 💻 Tech Stack
+## Công nghệ
 
 | Thành phần | Công nghệ |
 |-----------|-----------|
-| Backend | Node.js + Express + Prisma ORM |
-| Frontend | React + Tailwind CSS |
-| Database | MySQL (Railway) |
-| AI Chatbot | Google Gemini API |
-| Email OTP | Resend |
+| Backend | Node.js, Express, Prisma |
+| Frontend | React, Tailwind CSS |
+| Database | MySQL |
+| AI Chatbot | Google Gemini |
+| Email | Resend |
 | Thanh toán | VNPay |
-| Deploy | Vercel (FE) + Render (BE) |
+| Triển khai | Vercel (FE), Render (BE) |
 
 ---
 
-## ✨ Tính Năng Chính
+## Tính năng
 
-- ✅ Quản lý căn hộ, tòa nhà, hợp đồng
-- ✅ Quản lý người dùng theo vai trò
-- ✅ Hóa đơn điện nước, thanh toán VNPay
-- ✅ Báo cáo & xử lý sự cố kỹ thuật
-- ✅ Chat trực tiếp người thuê ↔ quản lý
-- ✅ Chatbot AI hỗ trợ 24/7 (Gemini)
-- ✅ Đăng nhập Google OAuth
-- ✅ Đăng ký xác thực OTP qua email
-- ✅ Dashboard theo từng vai trò
+- Quản lý căn hộ và hợp đồng
+- Quản lý người dùng theo vai trò
+- Hóa đơn điện nước và thanh toán VNPay
+- Báo cáo và xử lý sự cố kỹ thuật
+- Chat nội bộ giữa người thuê và quản lý
+- Chatbot AI hỗ trợ
+- Đăng nhập Google OAuth
+- Xác thực OTP qua email
 
 ---
 
-## 🐛 Xử Lý Lỗi Thường Gặp
+## Lỗi phổ biến
 
-**Lỗi: `Cannot connect to database`**
-> Kiểm tra kết nối internet — database đang trên cloud Railway
-
-**Lỗi: `Port 5000 already in use`**
-```bash
-# Đổi PORT trong server/.env
-PORT=5001
-```
-
-**Lỗi: `Module not found`**
-```bash
-cd server && npm install
-cd client && npm install
-```
+- `Cannot connect to database`: kiểm tra internet, database đang chạy trên Railway
+- `Port 5000 already in use`: đổi `PORT` trong `server/.env`
+- `Module not found`: chạy lại `npm install` trong `server` và `client`
