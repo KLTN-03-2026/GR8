@@ -1,4 +1,6 @@
 import * as service from "./hopdong.service.js";
+import bcrypt from "bcryptjs";
+import prisma from "../../config/prisma.js";
 
 export const create = async (req, res) => {
     try {
@@ -56,6 +58,22 @@ export const requestTerminate = async (req, res) => {
 
 export const terminate = async (req, res) => {
     try {
+        const { MatKhau } = req.body;
+        if (!MatKhau) {
+            return res.status(400).json({ success: false, message: "Vui lòng nhập mật khẩu xác nhận" });
+        }
+
+        // Kiểm tra mật khẩu của người đang thực hiện (req.user.ID)
+        const user = await prisma.nguoidung.findUnique({ where: { ID: req.user.ID } });
+        if (!user || !user.MatKhau) {
+            return res.status(401).json({ success: false, message: "Không tìm thấy thông tin người dùng" });
+        }
+
+        const isMatch = await bcrypt.compare(MatKhau, user.MatKhau);
+        if (!isMatch) {
+            return res.status(401).json({ success: false, message: "Mật khẩu xác nhận không chính xác" });
+        }
+
         const data = await service.terminateContract(req.params.id);
         res.json({ success: true, message: "Kết thúc hợp đồng thành công", data });
     } catch (error) {

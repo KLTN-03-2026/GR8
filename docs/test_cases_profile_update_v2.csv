@@ -1,0 +1,25 @@
+﻿"Test Case ID","Mô tả","Hành động","Điều kiện tiên quyết","Kết quả mong đợi","Kết quả thực tế"
+"TC-01","Cập nhật thành công với tất cả dữ liệu hợp lệ","1. Thay đổi Họ tên, Số điện thoại, Địa chỉ.
+2. Nhấn nút 'Lưu Thay Đổi'.","Đã đăng nhập vào hệ thống và đang ở trang Profile (Cá nhân).","Hệ thống hiển thị thông báo 'Cập nhật thông tin thành công!'. Dữ liệu mới được lưu và hiển thị chính xác sau khi tải lại trang.",""
+"TC-02","Kiểm tra để trống trường bắt buộc (Họ và Tên)","1. Xóa nội dung trong ô 'Họ và Tên'.
+2. Nhấn nút 'Lưu Thay Đổi'.","Đang ở trang Profile.","Hệ thống hiển thị thông báo lỗi 'Vui lòng nhập họ tên' ngay dưới trường dữ liệu. Không cho phép gửi yêu cầu lên server.",""
+"TC-03","Kiểm tra định dạng Email không hợp lệ","1. Nhập email sai định dạng (ví dụ: test@abc).
+2. Nhấn nút 'Lưu Thay Đổi'.","Đang ở trang Profile.","Hệ thống hiển thị thông báo lỗi 'Email không đúng định dạng'.",""
+"TC-04","Kiểm tra Số điện thoại không hợp lệ","1. Nhập số điện thoại có chứa chữ cái hoặc ít hơn 10 số.
+2. Nhấn nút 'Lưu Thay Đổi'.","Đang ở trang Profile.","Hệ thống hiển thị thông báo lỗi 'Số điện thoại không hợp lệ'.",""
+"TC-05","Kiểm tra định dạng CCCD không hợp lệ","1. Nhập CCCD có 11 chữ số.
+2. Nhấn nút 'Lưu Thay Đổi'.","Đang ở trang Profile.","Hệ thống hiển thị thông báo lỗi 'CCCD phải bao gồm 12 chữ số'.",""
+"TC-06","Thay đổi ảnh đại diện (Avatar) thành công","1. Di chuột vào avatar, chọn 'Đổi ảnh'.
+2. Chọn một file ảnh hợp lệ (.jpg, .png) dung lượng < 3MB.","Đang ở trang Profile.","Ảnh đại diện được cập nhật mới ngay lập tức trên giao diện và thanh Header. Có thông báo thành công.",""
+"TC-07","Upload ảnh CCCD mặt trước và mặt sau","1. Nhấn vào vùng upload CCCD mặt trước/sau.
+2. Chọn file ảnh hợp lệ.","Đang ở trang Profile.","Ảnh được tải lên thành công, hiển thị bản xem trước (preview) của ảnh đã chọn.",""
+"TC-08","Đổi mật khẩu thành công","1. Chuyển sang tab 'Đổi Mật Khẩu'.
+2. Nhập đúng mật khẩu hiện tại.
+3. Nhập mật khẩu mới hợp lệ (mạnh).
+4. Xác nhận mật khẩu khớp.
+5. Nhấn 'Đổi Mật Khẩu'.","Tài khoản không phải đăng nhập qua Google.","Thông báo 'Đổi mật khẩu thành công!'. Các ô nhập liệu được xóa trống.",""
+"TC-09","Đổi mật khẩu với mật khẩu hiện tại sai","1. Nhập sai mật khẩu hiện tại.
+2. Nhập mật khẩu mới và xác nhận hợp lệ.
+3. Nhấn 'Đổi Mật Khẩu'.","Tài khoản không phải đăng nhập qua Google.","Hệ thống báo lỗi 'Mật khẩu hiện tại không chính xác'.",""
+"TC-10","Mật khẩu mới và xác nhận không khớp","1. Nhập mật khẩu mới: Abc@123.
+2. Nhập xác nhận mật khẩu: Abc@124.","Đang ở tab Đổi mật khẩu.","Hệ thống báo lỗi 'Mật khẩu xác nhận không khớp' ngay tại ô xác nhận.",""

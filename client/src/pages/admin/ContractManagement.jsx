@@ -39,6 +39,10 @@ const ContractManagement = () => {
     ThoiHanThang: '12', // tháng, để tự tính NgayKetThuc
   });
   const [creating, setCreating] = useState(false);
+  const [showConfirmTerminate, setShowConfirmTerminate] = useState(false);
+  const [terminatePassword, setTerminatePassword] = useState('');
+  const [contractIdToTerminate, setContractIdToTerminate] = useState(null);
+  const [terminating, setTerminating] = useState(false);
 
   // Detail modal
   const [selectedContract, setSelectedContract] = useState(null);
@@ -179,15 +183,28 @@ const ContractManagement = () => {
     }
   };
 
-  const handleTerminate = async (id) => {
-    if (!window.confirm('Xác nhận kết thúc hợp đồng này?')) return;
+  const handleTerminate = (id) => {
+    setContractIdToTerminate(id);
+    setTerminatePassword('');
+    setShowConfirmTerminate(true);
+  };
+
+  const submitTerminate = async () => {
+    if (!terminatePassword) {
+      setError('Vui lòng nhập mật khẩu xác nhận');
+      return;
+    }
+    setTerminating(true);
     try {
-      await axios.put(`/hopdong/terminate/${id}`);
-      setSuccess(' Đã kết thúc hợp đồng!');
+      await axios.put(`/hopdong/terminate/${contractIdToTerminate}`, { MatKhau: terminatePassword });
+      setSuccess('Đã kết thúc hợp đồng thành công!');
+      setShowConfirmTerminate(false);
       fetchContracts();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err.response?.data?.message || 'Thao tác thất bại');
+    } finally {
+      setTerminating(false);
     }
   };
 
@@ -687,6 +704,61 @@ const ContractManagement = () => {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal xác nhận kết thúc (có nhập mật khẩu) */}
+      {showConfirmTerminate && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-rose-600 px-6 py-4 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Xác nhận kết thúc
+              </h3>
+              <button onClick={() => setShowConfirmTerminate(false)} className="text-white hover:bg-white/20 rounded-full p-1 text-2xl leading-none">&times;</button>
+            </div>
+            
+            <div className="p-6">
+              <div className="mb-6">
+                <p className="text-gray-900 font-bold text-lg mb-2">Đã hoàn tất các văn bản pháp lý và các vấn đề liên quan chưa ?</p>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  Hành động này sẽ thay đổi trạng thái hợp đồng thành <b>Kết thúc</b> và giải phóng căn hộ về trạng thái <b>Trống</b>. 
+                  Dữ liệu thành viên trong căn hộ cũng sẽ được cập nhật là <b>Đã rời</b>.
+                </p>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-bold text-gray-700 mb-2">Nhập mật khẩu quản trị để xác nhận:</label>
+                <input 
+                  type="password" 
+                  value={terminatePassword}
+                  onChange={(e) => setTerminatePassword(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all"
+                  placeholder="Mật khẩu của bạn"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setShowConfirmTerminate(false)}
+                  className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                >
+                  Hủy bỏ
+                </button>
+                <button 
+                  onClick={submitTerminate}
+                  disabled={terminating || !terminatePassword}
+                  className="flex-1 py-3 bg-rose-600 text-white font-bold rounded-xl hover:bg-rose-700 transition-colors shadow-lg shadow-rose-200 disabled:opacity-50"
+                >
+                  {terminating ? 'Đang xử lý...' : 'Xác nhận Kết thúc'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

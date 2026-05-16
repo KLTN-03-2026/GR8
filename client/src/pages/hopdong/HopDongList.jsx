@@ -28,6 +28,10 @@ const HopDongList = () => {
   const [trLoading, setTrLoading] = useState(false);
   const [trError, setTrError] = useState('');
   const [actionMsg, setActionMsg] = useState({ id: null, text: '', ok: false });
+  const [showConfirmTerminate, setShowConfirmTerminate] = useState(false);
+  const [terminatePassword, setTerminatePassword] = useState('');
+  const [contractIdToTerminate, setContractIdToTerminate] = useState(null);
+  const [terminating, setTerminating] = useState(false);
 
   useEffect(() => {
     fetchContracts();
@@ -97,18 +101,31 @@ const HopDongList = () => {
     }
   };
 
-  const handleTerminate = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn duyệt kết thúc hợp đồng này?')) return;
+  const handleTerminate = (id) => {
+    setContractIdToTerminate(id);
+    setTerminatePassword('');
+    setShowConfirmTerminate(true);
+  };
+
+  const submitTerminate = async () => {
+    if (!terminatePassword) {
+      setActionMsg({ id: contractIdToTerminate, text: 'Vui lòng nhập mật khẩu', ok: false });
+      return;
+    }
+    setTerminating(true);
     try {
-      await axios.put(`/hopdong/terminate/${id}`);
-      setActionMsg({ id, text: 'Đã duyệt kết thúc hợp đồng', ok: true });
+      await axios.put(`/hopdong/terminate/${contractIdToTerminate}`, { MatKhau: terminatePassword });
+      setActionMsg({ id: contractIdToTerminate, text: 'Đã duyệt kết thúc hợp đồng thành công!', ok: true });
+      setShowConfirmTerminate(false);
       setTimeout(() => {
         setActionMsg({ id: null, text: '', ok: false });
         fetchTerminateRequests();
         fetchContracts();
       }, 1500);
     } catch (err) {
-      setActionMsg({ id, text: err.response?.data?.message || 'Lỗi khi duyệt', ok: false });
+      setActionMsg({ id: contractIdToTerminate, text: err.response?.data?.message || 'Lỗi khi duyệt', ok: false });
+    } finally {
+      setTerminating(false);
     }
   };
 
@@ -595,7 +612,60 @@ const HopDongList = () => {
           )}
           </>
         )}
-      </div>
+      {/* Modal xác nhận kết thúc (có nhập mật khẩu) */}
+      {showConfirmTerminate && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-red-600 px-6 py-4 flex justify-between items-center text-white">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Xác nhận kết thúc
+              </h3>
+              <button onClick={() => setShowConfirmTerminate(false)} className="hover:bg-white/20 rounded-full p-1 text-2xl leading-none">&times;</button>
+            </div>
+            
+            <div className="p-6">
+              <div className="mb-6">
+                <p className="text-gray-900 font-bold text-lg mb-2">Đã hoàn tất các văn bản pháp lý và các vấn đề liên quan chưa ?</p>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  Hành động này sẽ thay đổi trạng thái hợp đồng thành <b>Kết thúc</b> và giải phóng căn hộ về trạng thái <b>Trống</b>. 
+                  Dữ liệu cư dân trong căn hộ cũng sẽ được cập nhật.
+                </p>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-bold text-gray-700 mb-2">Nhập mật khẩu quản trị để xác nhận:</label>
+                <input 
+                  type="password" 
+                  value={terminatePassword}
+                  onChange={(e) => setTerminatePassword(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                  placeholder="Mật khẩu của bạn"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setShowConfirmTerminate(false)}
+                  className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                >
+                  Hủy bỏ
+                </button>
+                <button 
+                  onClick={submitTerminate}
+                  disabled={terminating || !terminatePassword}
+                  className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors shadow-lg shadow-red-200 disabled:opacity-50"
+                >
+                  {terminating ? 'Đang xử lý...' : 'Xác nhận Kết thúc'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
